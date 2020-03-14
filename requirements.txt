@@ -1,0 +1,13 @@
+numpy
+scipy
+trimesh
+pysolar
+pytz
+pandas
+matplotlib
+mpld3
+jinja2
+pvlib
+netCDF4
+siphon
+tables
