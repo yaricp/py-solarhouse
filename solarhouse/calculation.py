@@ -82,7 +82,7 @@ class Calculation:
             power_heat_inside,
             efficiency_collector,
             efficient_angle_collector,
-           # windows={'area': 4.0, 'therm_r': 0.5},
+            windows={'area': 10.0, 'therm_r': 0.5},
             floor={'area_inside': 10.0,
                    'area_outside': 15.0,
                    'perimeter': 25.0,

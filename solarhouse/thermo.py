@@ -1,6 +1,9 @@
 from scipy.integrate import *
 import numpy as np
 
+from .thermoelement import Element
+from .thermomodel import Model
+
 
 class ThermalProcess:
     """Class implements all calculations of thermal processes."""
@@ -30,56 +33,123 @@ class ThermalProcess:
         self.C_mass_inside = 1200
         self.density = density_mass
         self.T_mass = 0
-        self.R_room = 1/8.7
-        self.R_out = 1/23
-        self.R_out_floor = 1/23
-        self.T_out_floor = -10
-
-        self.S_windows = building.windows['area']
-        self.S_floor_outside = building.floor['area_inside']
-        self.S_floor_inside = building.floor['area_outside']
-        self.kappa_floor = 0.5      # building.floor['']
-        self.kappa = 0.5
-        self.perimeter = building.floor['perimeter']
-        self.H_area = self.__get_H_area_mass()
-        self.S_walls_inside = building.walls_area_inside
-        print('S_inside: ', self.S_walls_inside)
-        self.S_walls_outside = building.walls_area_outside
-        print('S_outside: ', self.S_walls_outside)
-        self.thickness_wall = building.wall_thickness
-        self.K_walls = (
-                        self.S_walls_outside
-                        - self.S_walls_inside
-                       ) / self.thickness_wall
-        print('self.K_walls: ', self.K_walls)
-        self.density_walls = 500      #building.dict_material[building.material]['heat_capacity']
-        self.heat_capacity_walls = 2700
-
-        self.power_inside = building.power_heat_inside
-        self.dict_extra_losses = dict_extra_losses
+        self.alpha_room = 1/0.13
+        self.alpha_out = 1/0.04
 
         self.dx = 0.005     # meters
-        self.n_points = int(self.thickness_wall / self.dx)
-        print('self.n_points : ', self.n_points )
-        self.mass_air_room = building.volume_air_inside * 1.205
-        self.c_air_room = 1007
-        self.calc_dict = {}
-        #for key, row in self.dict_wallings.items():
-        #    self.dict_k.update({
-        #        key: self.__calc_k(
-        #            key,
-        #            row['therm_r'] if 'therm_r' in row else None,
-        #            row['area'],
-        #            layers=row['layers'] if 'layers' in row else [],
-        #            )
-        #        })
 
-        #self.q_windows_losses = 0
-        #if 'losses' in building.windows and building.windows['losses']:
-        #    self.q_windows_losses = building.windows['losses']
+        mass = Element(
+            name='mass',
+            temp0=self.T_start,
+            density=997,
+            heat_capacity=4183,
+            volume=0.5
+        )
 
+        room = Element(
+            name='room',
+            temp0=self.T_start,
+            density=1.27,
+            heat_capacity=1007,
+            volume=self.building.volume_air_inside,
+            area_inside=self.building.floor['area_inside'],
+            input_alpha=self.alpha_room
+        )
+        windows = Element(
+            name='windows',
+            temp0=-5,
+            area_inside=self.building.windows['area'],
+            input_alpha=1/self.building.windows['therm_r']
+        )
+        floor = Element(
+            name='floor',
+            temp0=18,
+            area_inside=self.building.floor['area_inside'],
+            area_outside=self.building.floor['area_outside'],
+            dx=0.005,
+            thickness=self.building.floor_thickness,
+            kappa=self.building.get_prop(
+                self.building.floor['material'],
+                'kappa'),
+            density=self.building.get_prop(
+                self.building.floor['material'],
+                'density'),
+            heat_capacity=self.building.get_prop(
+                self.building.floor['material'],
+                'heat_capacity'),
+            input_alpha=self.alpha_room
+        )
+
+        walls = Element(
+            name='walls',
+            temp0=self.T_start,
+            area_inside=self.building.walls_area_inside,
+            area_outside=self.building.walls_area_outside,
+            dx=0.005,
+            thickness=self.building.wall_thickness,
+            kappa=self.building.get_prop(
+                self.building.material,
+                'kappa'),
+            density=self.building.get_prop(
+                self.building.material,
+                'density'),
+            heat_capacity=self.building.get_prop(
+                self.building.material,
+                'heat_capacity'),
+            input_alpha=self.alpha_room
+        )
+        walls_mass = Element(
+            name='walls_mass',
+            temp0=self.T_start,
+            dx=0.005,
+            area_inside=self.building.area_mass_walls_inside,
+            area_outside=self.building.area_mass_walls_outside,
+            thickness=self.building.wall_thickness,
+            kappa=self.building.get_prop(
+                self.building.material,
+                'kappa'),
+            density=self.building.get_prop(
+                self.building.material,
+                'density'),
+            heat_capacity=self.building.get_prop(
+                self.building.material,
+                'heat_capacity'),
+            input_alpha=self.alpha_room
+        )
+        outside = Element(
+            name='outside',
+            temp0=-5,
+            area_inside=self.building.walls_area_outside,
+            input_alpha=self.alpha_out
+        )
+        fl_outside = Element(
+            name='fl_out',
+            temp0=self.building.floor['t_out'],
+            area_inside=self.building.floor['area_outside'],
+            input_alpha=self.alpha_out
+        )
+
+
+        self.model = Model(name=variant)
         if variant == 'all_heat_inside':
-            self.update_func = self.heat_inside
+            mass.branches_loss = [room, floor, walls_mass]
+            room.branches_loss = [windows, walls]
+            walls.branches_loss = [outside]
+            walls_mass.branches_loss = [outside]
+            floor.branches_loss = [fl_outside]
+            self.model.elements = {
+                'mass': mass,
+                'room': room,
+                'wall': walls,
+                'walls_mass': walls_mass,
+                'floor': floor,
+                'windows': windows,
+                'outside': outside,
+                'fl_out': fl_outside
+            }
+            self.model.start_element = mass
+            self.model.outside_elements = [outside,fl_outside]
+            self.model.plots = [mass,room,walls]
         elif variant == 'only_sun_power':
             self.update_func = self.heat_sun
 
@@ -334,12 +404,14 @@ class ThermalProcess:
 
     def run_process(self):
         """Start main calculation process."""
+        '''
         self.T_mass = self.T_start
         branches = ['floor', 'room-walls', 'mass-walls']
         nodes = {1:['floor', 'room-walls', 'mass-walls'],
                  2:['windows']}
         for b in branches:
             self.prepare_chain(b)
+        '''
         self.seconds = 60*60
 
         for index in self.sun_power_data.index:
@@ -348,6 +420,12 @@ class ThermalProcess:
             print('index: ', index)
             print('SUN:', sun)
             print('temp out: ', self.t_out)
-            result = self.run_heat_in_mass(sun, self.t_out)
+            self.model.start(
+                seconds=self.seconds,
+                power=sun,
+                t_out=self.t_out
+            )
+            exit(0)
+            #result = self.run_heat_in_mass(sun, self.t_out)
 
         return result

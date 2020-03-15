@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 
 from solarhouse.thermoelement import Element
+from solarhouse.thermomodel import Model
 
 power = 1000
 seconds = 60 * 60
@@ -11,6 +12,7 @@ area_floor = 3.13 * R ** 2
 
 alpha_room = 1/0.13
 alpha_out = 1/0.04
+alpha_windows = 1 / 0.52
 
 mass = Element(
     name='mass',
@@ -26,12 +28,14 @@ room = Element(
     density=1.27,
     heat_capacity=1007,
     volume=V,
-    area_inside=area_floor
+    area_inside=area_floor,
+    input_alpha=alpha_room
 )
 windows = Element(
     name='windows',
     temp0=-5,
-    area_inside=10
+    area_inside=10,
+    input_alpha=alpha_windows
 )
 floor = Element(
     name='floor',
@@ -42,7 +46,8 @@ floor = Element(
     thickness=0.3,
     kappa=0.7,
     density=1450,
-    heat_capacity=880
+    heat_capacity=880,
+    input_alpha=alpha_room
 )
 
 walls = Element(
@@ -54,58 +59,51 @@ walls = Element(
     thickness=0.3,
     kappa=0.7,
     density=1450,
-    heat_capacity=880
+    heat_capacity=880,
+    input_alpha=alpha_room
 )
 outside = Element(
     name='outside',
     temp0=-5,
-    area_inside=160
+    area_inside=160,
+    input_alpha=alpha_out
 )
 fl_outside = Element(
     name='fl_out',
     temp0=5,
-    area_inside=area_floor+20
+    area_inside=area_floor+20,
+    input_alpha=alpha_out
 )
-alpha_windows = 1 / 0.52
-mass.branches_loss =[
-    {'alpha': alpha_room, 'el': room},
-    {'alpha': alpha_room, 'el': floor}
-]
-room.branches_loss = [
-    {'alpha': alpha_windows, 'el': windows},
-    {'alpha': alpha_room, 'el': walls}
-]
-walls.branches_loss = [
-    {'alpha': alpha_out, 'el': outside}
-]
-floor.branches_loss = [
-    {'alpha': alpha_out, 'el': fl_outside}
-]
-mass_t_list = [mass.temp]
-room_t_list = [room.temp]
-wall_t_list = [walls.temp]
-#Start calculation by the seconds and input power by Watt
-for t in range(1, seconds):
-    mass.start_calc(power)
-    mass_t_list.append(mass.temp)
-    room_t_list.append(room.temp)
-    wall_t_list.append(walls.temp)
-    print('---------------')
-    print('Temp mass room : ')
-    print(mass.temp, room.temp)
-    print(' Twall[0]: ', walls.temp)
-    print('---------------')
-# shows results
-plt.plot(range(0, seconds), mass_t_list, lw=2)
-plt.plot(range(0, seconds), room_t_list, lw=2)
-plt.plot(range(0, seconds), wall_t_list, lw=2)
-#plt.ylim(19, 21)
-plt.xlabel('t')
-plt.ylabel('T room')
-plt.show()
-print(walls.dTx_list)
+
+mass.branches_loss =[room, floor]
+room.branches_loss = [windows, walls]
+walls.branches_loss = [outside]
+floor.branches_loss = [fl_outside]
+
+mass_model = Model(name='power_to_mass')
+mass_model.elements = {
+    'mass': mass,
+    'room': room,
+    'wall': walls,
+    'floor': floor,
+    'windows': windows,
+    'outside': outside,
+    'fl_out': fl_outside
+}
+mass_model.start_element = mass
+mass_model.outside_elements = [windows, outside]
+mass_model.initial_conditions = {
+    'mass': 20,
+    'wall': 20,
+    'room': 20,
+    'floor': 20,
+    'fl_out': 5
+}
+mass_model.plots = [mass, room, walls]
+
+mass_model.start(seconds,power,t_out=-10)
+
 plt.plot(range(0, len(walls.dTx_list)), walls.dTx_list, lw=2)
-#plt.ylim(19, 21)
 plt.xlabel('x')
 plt.ylabel('T')
 plt.show()

@@ -32,6 +32,7 @@ class Element:
         self.dx = kwargs.get('dx',None)
         self.area_inside = kwargs.get('area_inside', None)
         self.area_outside = kwargs.get('area_outside', None)
+        self.input_alpha = kwargs.get('input_alpha', None)
 
         self.branches_loss = []
         self.counter = 0
@@ -46,6 +47,15 @@ class Element:
                 and self.area_outside > self.area_inside):
             self.k_area = ((self.area_outside - self.area_inside)
                  /self.thickness)
+
+    def init_conditions(self, val):
+        """"""
+        new_list = []
+        for t in self.dTx_list:
+            new_list.append(val)
+        self.dTx_list = new_list
+        self.temp = self.dTx_list[0]
+        return
 
     def __get_area_dx(self, iterator):
         """
@@ -99,13 +109,11 @@ class Element:
                 #if (self.dTx_list[iterator]
                 #    - branch['el'].temp):
                 q = (
-                        branch['alpha']
-                        * branch['el'].area_inside
+                        branch.input_alpha
+                        * branch.area_inside
                         * round((self.dTx_list[iterator]
-                                 - branch['el'].temp), self.round)
+                                 - branch.temp), self.round)
                     )
-                if self.name == 'mass':
-                    print('q_loss ',branch['el'].name, ': ', q)
                 q_loss += q
             return q_loss
 
@@ -134,8 +142,6 @@ class Element:
         cm_dx = self.__get_cm_dx(iterator)
         qcm = q_enter - q_loss
         dTdt = qcm / cm_dx
-        if self.name == 'mass':
-            print('dTdt: ', dTdt)
         if dTdt:
             self.dTx_list[iterator] = round(
                 self.dTx_list[iterator]
@@ -151,14 +157,13 @@ class Element:
         :return:
             change self.temp parameter in the end of calculation
         """
-
         if not self.heat_capacity or not self.density:
             return
         for i in range(0, self.n):
             q_loss = self.get_loss_dx(i)
             self.calc_temp(q_enter, q_loss, i)
             for branch in self.branches_loss:
-                branch['el'].start_calc(q_loss)
+                branch.start_calc(q_loss)
             q_enter = q_loss
         self.temp = self.dTx_list[0]
 

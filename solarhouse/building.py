@@ -128,8 +128,6 @@ class Building:
         self.efficiency = efficiency
         self.effective_angle = effective_angle
         self.cover_material = cover_material
-        self.mass_walls = 0
-        self.volume_air_inside = 0
         self.dict_properties_materials = properties_materials
         self.therm_r = kwargs.get('therm_r', None)
         self.wall_layers = kwargs.get('wall_layers', None)
@@ -141,6 +139,13 @@ class Building:
         if self.dict_mass_inside:
             self.__check_materials()
         self.ventilation_losses = kwargs.get('ventilation_losses', 0)
+        self.heat_accumulator = kwargs.get('heat_accumulator', {
+            'volume': 1,
+            'material': 'water',
+            'mass': 996,
+            'heat_capacity': 4136,
+            'density': 996
+        })
         self.windows = kwargs.get('windows', {
             'therm_r': 0,
             'losses': 0,
@@ -163,13 +168,6 @@ class Building:
         self.__correct_wall_thickness()
         #self.__calc_mass_walls()
 
-        self.mass = self.mass_walls
-        #self.walls_area = (
-        #        self.mesh.area
-        #        - self.windows['area']
-        #        - self.floor['area']
-        #        - self.ceiling['area']
-        #        )
         self.weather_data = None
         self.power_data = None
         self.power_data_by_days = None
@@ -279,6 +277,31 @@ class Building:
     @property
     def face_areas(self) -> list:
         return self.mesh.area_faces
+
+    @property
+    def volume_air_inside(self) -> float:
+        """"""
+        if self.heat_accumulator['volume']:
+            return (
+                    self.mesh_inside.volume
+                    - self.heat_accumulator['volume']
+            )
+        if self.heat_accumulator['mass'] and self.heat_accumulator['density']:
+            mass_volume = self.heat_accumulator['mass'] * self.heat_accumulator['density']
+        else:
+            mass_volume = self.get_prop(
+                self.heat_accumulator['material'],
+                'density'
+            ) * self.heat_accumulator['mass']
+        return self.mesh_inside.volume - mass_volume
+
+    @property
+    def floor_thickness(self) -> float:
+        """"""
+        if 'thickness' in self.floor and self.floor['thickness']:
+            return self.floor['thickness']
+        return self.wall_thickness
+
 
     def get_perimeter(self, where):
         pass
@@ -421,7 +444,15 @@ class Building:
         self.power_data['ind_face'] = self.power_data[fields].idxmax(axis=1)
         self.power_data_by_days = self.power_data['summ'].resample('1D').mean()
         return
-        
+
+    def get_prop(self, material, prop):
+        """"""
+        if not material in self.dict_properties_materials:
+            material = self.material
+        if prop == "kappa":
+            return 1/self.dict_properties_materials[material][prop]
+        return self.dict_properties_materials[material][prop]
+
     def prepare_dict_wallings(self):
         """Prepares dictionary layers of wallings."""
 
