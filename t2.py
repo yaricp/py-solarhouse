@@ -1,14 +1,15 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
 from solarhouse.thermoelement import Element
 from solarhouse.thermomodel import Model
 
 power = 1000
 seconds = 60 * 60
-R = 4
-V = (2 / 3) * 3.14 * (R ** 3)
-S = 2 * 3.14 * (R ** 2)
-area_floor = 3.13 * R ** 2
+R = 4 #radius
+V = (2 / 3) * 3.14 * (R ** 3) #Volume
+S = 2 * 3.14 * (R ** 2) #Square
+area_floor = 3.13 * R ** 2 # Area Floor
 
 alpha_room = 1/0.13
 alpha_out = 1/0.04
@@ -100,8 +101,10 @@ mass_model.initial_conditions = {
     'fl_out': 5
 }
 mass_model.plots = [mass, room, walls]
+dt = 1
+count = int(seconds / dt)
 
-mass_model.start(seconds,power,t_out=-10)
+mass_model.start(count, dt, power, t_out=-10)
 
 plt.plot(range(0, len(walls.dTx_list)), walls.dTx_list, lw=2)
 plt.xlabel('x')

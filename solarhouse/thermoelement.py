@@ -125,7 +125,7 @@ class Element:
         area = self.__get_area_dx(iterator)
         kappa = self.__get_kappa_dx(iterator)
         q_loss = (area * (temp1 - temp2)) / (self.dx / kappa)
-        if abs(q_loss) > 5000:
+        """if abs(q_loss) > 5000:
             print('name: ', self.name)
             print('area: ', area)
             print('kappa: ', kappa)
@@ -138,7 +138,7 @@ class Element:
             exit(0)
         if math.isnan(q_loss):
             print('IS NAN!')
-            exit(0)
+            exit(0)"""
         return q_loss
 
     def calc_temp(self, q_enter, q_loss, iterator):
