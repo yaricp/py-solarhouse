@@ -82,10 +82,10 @@ class Calculation:
             power_heat_inside,
             efficiency_collector,
             efficient_angle_collector,
-            windows={'area': 10.0, 'therm_r': 0.5},
-            floor={'area_inside': 10.0,
-                   'area_outside': 15.0,
-                   'perimeter': 25.0,
+            windows={'area': 12.0, 'therm_r': 0.5},
+            heat_accumulator={'volume': 1.0, 'density': 996.0},
+            floor={'t_out': 4.0,
+                   'material': wall_material,
                    'layers': [{
                     'thickness': 0.1,
                     'lambda':0.04,
@@ -261,10 +261,10 @@ class Calculation:
             date = datetime.datetime.now()
             start = pd.Timestamp(date, tz=self.tz)
             end = start + pd.Timedelta(days=1)
-        print(start)
-        print(end)
+        #print(start)
+        #print(end)
         self.building.weather_data = get_weather(start, end)
-        print(self.building.weather_data.index)
+        #print(self.building.weather_data.index)
         self.building.calc_sun_power_on_faces()
         #dict_walling = self.building.prepare_dict_wallings()
         t_proc = ThermalProcess(20, self.building, mass_inside=500, density_mass=450)

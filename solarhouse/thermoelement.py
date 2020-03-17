@@ -1,12 +1,22 @@
+import math
 import numpy as np
 
 
 class Element:
     """
     Implements thermal element for thermal calculations.
-    It is may be represents as a point with heat capacity.
-    Also it may be represented like a walls with a variable area
-    and with variable thermal resistance.
+    It represents as a point with heat capacity.
+    Change of temperature of this point depend of summ of input and
+    output energy and heat capacity. Output energy are negative.
+    The several elements can be connected to the chain of elements.
+    Output energy depends of temperature current element and temperature
+    next element in chain and thermal resistance between each other.
+    The element can have several elements of output enegry.
+    Non first elements must have area of input face (square meters)
+    and input coefficient of transcalency on input face.
+
+    Also element may be represented like a wall with a variable area
+    and with variable thermal resistance on each dx.
     Calculation realized on one direction dx.
     All calculations makes for dt.
     """
@@ -14,7 +24,7 @@ class Element:
     def __init__(
             self,
             name,
-            temp0,
+            temp0=None,
             density=None,
             heat_capacity=None,
             volume=None,
@@ -49,7 +59,7 @@ class Element:
                  /self.thickness)
 
     def init_conditions(self, val):
-        """"""
+        """Reduction to initial conditions"""
         new_list = []
         for t in self.dTx_list:
             new_list.append(val)
@@ -68,9 +78,6 @@ class Element:
         if self.k_area:
             return (self.area_inside
                     + iterator * self.dx * self.k_area)
-        #if self.area_inside:
-        #    return self.area_inside
-        #sreturn self.area_outside
 
     def __get_kappa_dx(self, iterator):
         """
@@ -94,6 +101,14 @@ class Element:
             return self.volume * a
         return self.dx * self.__get_area_dx(iterator) * a
 
+    def calc_loss_input_q(self, t_in: float) -> float:
+        """Calculates loss energy between current and previous elements"""
+        return (
+                self.input_alpha
+                * self.area_inside
+                * round((t_in - self.temp), self.round)
+            )
+
     def get_loss_dx(self, iterator):
         """
         Defines loss energy from current element on dx or from all
@@ -103,27 +118,28 @@ class Element:
         :return:
             Float value of all loss power
         """
-        q_loss = 0
-        if (iterator + 1) == self.n:
-            for branch in self.branches_loss:
-                #if (self.dTx_list[iterator]
-                #    - branch['el'].temp):
-                q = (
-                        branch.input_alpha
-                        * branch.area_inside
-                        * round((self.dTx_list[iterator]
-                                 - branch.temp), self.round)
-                    )
-                q_loss += q
-            return q_loss
-
         temp1 = round(self.dTx_list[iterator], self.round)
         temp2 = round(self.dTx_list[iterator + 1], self.round)
         if temp1 == temp2:
             return 0
         area = self.__get_area_dx(iterator)
         kappa = self.__get_kappa_dx(iterator)
-        return area * (temp1 - temp2) / (self.dx / kappa)
+        q_loss = (area * (temp1 - temp2)) / (self.dx / kappa)
+        if abs(q_loss) > 5000:
+            print('name: ', self.name)
+            print('area: ', area)
+            print('kappa: ', kappa)
+            print('self.dx: ', self.dx)
+            print('temp1: ', temp1)
+            print('temp2: ', temp2)
+            print('(self.dx / kappa): ', (self.dx / kappa))
+            print('(area * (temp1 - temp2)): ', (area * (temp1 - temp2)))
+            print('q_loss: ', q_loss)
+            exit(0)
+        if math.isnan(q_loss):
+            print('IS NAN!')
+            exit(0)
+        return q_loss
 
     def calc_temp(self, q_enter, q_loss, iterator):
         """
@@ -138,10 +154,12 @@ class Element:
             Nothing returns but change temperature in list of
             temperatures by dx in the current point
         """
-
         cm_dx = self.__get_cm_dx(iterator)
         qcm = q_enter - q_loss
         dTdt = qcm / cm_dx
+        if dTdt > 100.0:
+            print('EXIT ', self.name, ' dTdt: ', dTdt)
+            exit(0)
         if dTdt:
             self.dTx_list[iterator] = round(
                 self.dTx_list[iterator]
@@ -160,11 +178,21 @@ class Element:
         if not self.heat_capacity or not self.density:
             return
         for i in range(0, self.n):
-            q_loss = self.get_loss_dx(i)
+            q_loss = 0
+            if (i + 1) == self.n:
+                if self.name == 'mass':
+                    print('self.dTx_list[i]:', self.dTx_list[i])
+                for branch in self.branches_loss:
+                    q = branch.calc_loss_input_q(self.dTx_list[i])
+                    if self.name == 'mass':
+                        print('   ', branch.name, ': ', q)
+                    branch.start_calc(q)
+                    q_loss += q
+            else:
+                q_loss = self.get_loss_dx(i)
             self.calc_temp(q_enter, q_loss, i)
-            for branch in self.branches_loss:
-                branch.start_calc(q_loss)
             q_enter = q_loss
+
         self.temp = self.dTx_list[0]
 
 
