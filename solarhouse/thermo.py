@@ -1,56 +1,76 @@
 from scipy.integrate import *
 import numpy as np
+import matplotlib.pyplot as plt
 
 from .thermoelement import Element
 from .thermomodel import Model
 
 
 class ThermalProcess:
-    """Class implements all calculations of thermal processes."""
+    """
+    Class implements all calculations of thermal processes in house.
+    There are three main models of house:
+    1. All solar power (with efficient for water solar collector) comes to inside the massive in the house.
+    2. All solar power (with efficient for air solar collector) comes to inside the volume in the house.
+    3. All solar power comes inside the walls through glass dome.
+
+    """
 
     def __init__(
             self,
-            t_start,
-            building,
-            mass_inside=0,
-            density_mass=0,
-            dict_extra_losses=None,
-            variant='all_heat_inside',
-            **kwargs):
+            t_start: float,
+            building: object,
+            variant: str = 'all_heat_inside',
+            **kwargs) -> None:
         """
         Initialize item of thermo calculation.
         c - ;
         1,007 - Specific heat capacity of air (wikipedia)
         1,1839 - Density of air (wikipedia)
+        There are creating all main thermo elements of the building:
+        1. Massive object inside the building (It is model of any massive objects: water boiler, hot floor ,etc.)
+        2. Air inside the building.
+        3. Walls (without windows).
+        4. Windows (if area of windows set in building).
+        5. Floor.
+        6. Area walls around the massive object.
+        7. Outside  - temperature of air around the building.
+        8. Floor outside - temperature of air under the floor under the insulation
+        9. Glass dome around the building.
+        This elements can be combined to three variant (power to massive object, power to air, power to walls).
+        dx for non-homogeneous elements is in meters.
+
         """
         self.count = 0
+        self.seconds = 60
         self.building = building
-        self.T_start = t_start
-        #print(building.power_data['summ'])
-        #exit(0)
+        self.t_start = t_start
         self.sun_power_data = self.building.power_data['summ'].resample('1h').interpolate()
         self.weather_data = self.building.weather_data['temp_air'].resample('1h').interpolate()
 
-        self.mass_inside = mass_inside
-        self.C_mass_inside = 1200
-        self.density = density_mass
-        self.T_mass = 0
         self.alpha_room = 1/0.13
         self.alpha_out = 1/0.04
 
         self.dx = 0.005     # meters
+        self.heat_accumulator_volume = self.building.heat_accumulator['volume']
+        if not self.building.heat_accumulator['volume']:
+            self.heat_accumulator_volume = (self.building.heat_accumulator['mass']
+                                            /self.building.get_prop(
+                                            self.building.heat_accumulator['material'],
+                                            'density')
+                                            )
 
         mass = Element(
             name='mass',
-            temp0=self.T_start,
+            temp0=self.t_start,
             density=997,
             heat_capacity=4183,
-            volume=0.5
+            volume=self.building.heat_accumulator['volume']
         )
 
         room = Element(
             name='room',
-            temp0=self.T_start,
+            temp0=self.t_start,
             density=1.27,
             heat_capacity=1007,
             volume=self.building.volume_air_inside,
@@ -68,7 +88,7 @@ class ThermalProcess:
             temp0=18,
             area_inside=self.building.floor_area_inside,
             area_outside=self.building.floor_area_outside,
-            dx=0.005,
+            dx=self.dx,
             thickness=self.building.floor_thickness,
             kappa=self.building.get_prop(
                 self.building.floor['material'],
@@ -84,10 +104,10 @@ class ThermalProcess:
 
         walls = Element(
             name='walls',
-            temp0=self.T_start,
+            temp0=self.t_start,
             area_inside=self.building.walls_area_inside,
             area_outside=self.building.walls_area_outside,
-            dx=0.005,
+            dx=self.dx,
             thickness=self.building.wall_thickness,
             kappa=self.building.get_prop(
                 self.building.material,
@@ -102,8 +122,8 @@ class ThermalProcess:
         )
         walls_mass = Element(
             name='walls_mass',
-            temp0=self.T_start,
-            dx=0.005,
+            temp0=self.t_start,
+            dx=self.dx,
             area_inside=self.building.area_mass_walls_inside,
             area_outside=self.building.area_mass_walls_outside,
             thickness=self.building.wall_thickness,
@@ -131,9 +151,8 @@ class ThermalProcess:
             input_alpha=self.alpha_out
         )
 
-
         self.model = Model(name=variant)
-        if variant == 'all_heat_inside':
+        if variant == 'power_to_mass':
             mass.branches_loss = [room, floor, walls_mass]
             room.branches_loss = [windows, walls]
             walls.branches_loss = [outside]
@@ -152,27 +171,35 @@ class ThermalProcess:
             self.model.start_element = mass
             self.model.outside_elements = [outside,fl_outside]
             self.model.plots = [mass,room,walls]
-        elif variant == 'only_sun_power':
+        elif variant == 'power_to air':
             self.update_func = self.heat_sun
+        elif variant == 'power_to walls':
+            pass
 
     def run_process(self):
-        """Start main calculation process."""
-        self.seconds = 60*60
-        dt = 0.1
+        """
+        Start main calculation process.
+        In the end of process it show a plots of temperatures
+        """
+        self.seconds = 60 * 60
+        dt = 5
         count_dt = int(self.seconds / dt)
-
+        list_for_plot = []
         for index in self.sun_power_data.index:
             sun = self.sun_power_data[index]
             self.t_out = self.weather_data[index]
-            print('index: ', index)
-            print('SUN:', sun)
-            print('temp out: ', self.t_out)
-            self.model.start(
+            out_list = self.model.start(
                 count=count_dt,
                 dt=dt,
-                power=2000,
+                power=sun,
                 t_out=self.t_out
             )
-            exit(0)
 
-        return result
+            list_for_plot += out_list
+
+        n = len(self.sun_power_data.index) * count_dt
+        print(len(list_for_plot))
+        print(n)
+        plt.plot(range(n), list_for_plot, lw=2)
+        plt.show()
+        return

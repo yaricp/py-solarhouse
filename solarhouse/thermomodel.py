@@ -9,7 +9,11 @@ class Model:
 
 
     def __init__(self, name, **kwargs):
-        """"""
+        """
+        Initialization of model for calculations.
+        :param name: string of name of model
+        :param kwargs: some parameters
+        """
         self.name = name
         self.elements = kwargs.get('elements', {})
         self.plots = kwargs.get('plots', [])
@@ -46,14 +50,14 @@ class Model:
         for el in self.outside_elements:
             el.temp = t_out
         for i in range(count):
-            q_enter = power * dt
-            self.start_element.start_calc(q_enter)
+            self.start_element.start_calc(power, dt)
             for el in self.plots:
                 plots[el.name].append(el.temp)
         for el in self.plots:
             plots[el.name].pop()
-            plt.plot(range(count), plots[el.name], lw=2)
-        if self.plots:
-            plt.xlabel('t')
-            plt.ylabel('T')
-            plt.show()
+        #    plt.plot(range(count), plots[el.name], lw=2)
+        return plots[el.name]
+        #if self.plots:
+        #    plt.xlabel('t')
+        #    plt.ylabel('T')
+        #    plt.show()

@@ -101,7 +101,7 @@ mass_model.initial_conditions = {
     'fl_out': 5
 }
 mass_model.plots = [mass, room, walls]
-dt = 1
+dt = 10
 count = int(seconds / dt)
 
 mass_model.start(count, dt, power, t_out=-10)

@@ -17,8 +17,22 @@ class Element:
 
     Also element may be represented like a wall with a variable area
     and with variable thermal resistance on each dx.
-    Calculation realized on one direction dx.
+    Calculation realized on one direction dx (in meters).
     All calculations makes for dt.
+    Example calculate temperature of mass of water volume 1 cubic meter in 1 hour and 1 kW power:
+    >>> e  = Element(\
+            name='cube_water',\
+            temp0=0,\
+            density=997,\
+            heat_capacity=4180,\
+            volume=1\
+            )
+    >>> e.n
+    1
+    >>> e.start_calc(1000,3600)
+    >>> round(e.temp, 3)
+    0.864
+
     """
 
     def __init__(
@@ -106,7 +120,7 @@ class Element:
         return (
                 self.input_alpha
                 * self.area_inside
-                * round((t_in - self.temp), self.round)
+                * (t_in - self.temp)
             )
 
     def get_loss_dx(self, iterator):
@@ -118,30 +132,22 @@ class Element:
         :return:
             Float value of all loss power
         """
-        temp1 = round(self.dTx_list[iterator], self.round)
-        temp2 = round(self.dTx_list[iterator + 1], self.round)
+        temp1 = self.dTx_list[iterator]
+        temp2 = self.dTx_list[iterator + 1]
         if temp1 == temp2:
             return 0
         area = self.__get_area_dx(iterator)
         kappa = self.__get_kappa_dx(iterator)
         q_loss = (area * (temp1 - temp2)) / (self.dx / kappa)
-        """if abs(q_loss) > 5000:
-            print('name: ', self.name)
-            print('area: ', area)
-            print('kappa: ', kappa)
-            print('self.dx: ', self.dx)
-            print('temp1: ', temp1)
-            print('temp2: ', temp2)
-            print('(self.dx / kappa): ', (self.dx / kappa))
-            print('(area * (temp1 - temp2)): ', (area * (temp1 - temp2)))
-            print('q_loss: ', q_loss)
-            exit(0)
-        if math.isnan(q_loss):
-            print('IS NAN!')
-            exit(0)"""
+
         return q_loss
 
-    def calc_temp(self, q_enter, q_loss, iterator):
+    def calc_temp(
+            self,
+            q_enter: float,
+            q_loss: float,
+            iterator: int,
+            dt: float) -> None:
         """
         Calculates the dT on dt of current point (dx) of element.
         If element represent as a point then calculates.
@@ -150,23 +156,19 @@ class Element:
             source of power
         :param q_loss: total power loss from current point dx
         :param iterator: number of current dx
+        :param dt: range of time for calculate
         :return:
             Nothing returns but change temperature in list of
             temperatures by dx in the current point
         """
         cm_dx = self.__get_cm_dx(iterator)
         qcm = q_enter - q_loss
-        dTdt = qcm / cm_dx
-        if dTdt > 100.0:
-            print('EXIT ', self.name, ' dTdt: ', dTdt)
-            exit(0)
-        if dTdt:
-            self.dTx_list[iterator] = round(
-                self.dTx_list[iterator]
-                + dTdt, self.round)
+        dT = dt * qcm / cm_dx
+        if dT:
+            self.dTx_list[iterator] = self.dTx_list[iterator] + dT
         return
 
-    def start_calc(self, q_enter):
+    def start_calc(self, q_enter: float, dt: float) -> None:
         """
         Start of calculate temperature of element if
         it represent as a point or calculate of all
@@ -180,19 +182,18 @@ class Element:
         for i in range(0, self.n):
             q_loss = 0
             if (i + 1) == self.n:
-                if self.name == 'mass':
-                    print('self.dTx_list[i]:', self.dTx_list[i])
                 for branch in self.branches_loss:
                     q = branch.calc_loss_input_q(self.dTx_list[i])
-                    if self.name == 'mass':
-                        print('   ', branch.name, ': ', q)
-                    branch.start_calc(q)
+                    branch.start_calc(q, dt)
                     q_loss += q
             else:
                 q_loss = self.get_loss_dx(i)
-            self.calc_temp(q_enter, q_loss, i)
+            self.calc_temp(q_enter, q_loss, i, dt)
             q_enter = q_loss
 
-        self.temp = self.dTx_list[0]
+        self.temp = round(self.dTx_list[0], self.round)
 
 
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

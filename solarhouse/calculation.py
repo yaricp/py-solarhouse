@@ -4,8 +4,6 @@ import calendar
 import pytz
 import matplotlib.pyplot as plt
 import mpld3
-import scipy
-#import json 
 import uuid
 import csv
 
@@ -199,6 +197,8 @@ class Calculation:
             Column names are: ``ghi, dni, dhi``
         """
         fx_model = GFS()
+        print('START: ', start)
+        print('END: ', end)
         return fx_model.get_processed_data(
             self.geo['latitude'],
             self.geo['longitude'],
@@ -253,21 +253,21 @@ class Calculation:
             end = start + pd.Timedelta(months=1)
         elif date:
             start = pd.Timestamp(date, tz=self.tz)
-            end = start + pd.Timedelta(days=1)
+            end = start + pd.Timedelta(days=7)
         elif period:
             start = pd.Timestamp(period[0], tz=self.tz)
             end = pd.Timestamp(period[1], tz=self.tz)
         else:
             date = datetime.datetime.now()
             start = pd.Timestamp(date, tz=self.tz)
-            end = start + pd.Timedelta(days=1)
+            end = start + pd.Timedelta(days=7)
         #print(start)
         #print(end)
         self.building.weather_data = get_weather(start, end)
-        #print(self.building.weather_data.index)
+        print(self.building.weather_data.index)
         self.building.calc_sun_power_on_faces()
         #dict_walling = self.building.prepare_dict_wallings()
-        t_proc = ThermalProcess(20, self.building, mass_inside=500, density_mass=450)
+        t_proc = ThermalProcess(20, self.building)
         t_proc.run_process()
         #
         # self.building.calc_temp_in_house()

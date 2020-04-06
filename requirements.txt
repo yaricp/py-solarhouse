@@ -1,6 +1,7 @@
 numpy
 scipy
 trimesh
+shapely
 pysolar
 pytz
 pandas

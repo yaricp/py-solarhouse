@@ -20,7 +20,7 @@ def main():
     date = datetime.datetime(day=22, month=7, year=2019)
     calc_id = calc.id
     # datetime.datetime.now() , with_weather=False
-    calc.start(date=datetime.datetime.now())
+    calc.start(date=datetime.datetime.now(), with_weather=True)
     calc.export('power', 'month')
     calc.export('temperature', 'month')
     calc.create_html('temperature', 'month')

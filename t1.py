@@ -1,33 +1,48 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
 from solarhouse.thermoelement import Element
+from solarhouse.thermomodel import Model
 
-power = 7000
-seconds = 60 * 60
-wall = Element(name='wall',
-            temp0=20,
-            density=1450,
-            heat_capacity=880,
-            volume=None,
-            thickness=0.3,
-            dx=0.005,
-            kappa=0.7,
-            area_inside=150,
-            area_outside=160
-             )
+
+alpha_out = 1/0.04
+alpha_windows = 1 / 0.52
+
+mass = Element(
+    name='mass',
+    temp0=20,
+    density=997,
+    heat_capacity=4183,
+    volume=0.001
+)
+
 outside = Element(
-            name='outside',
-            temp0=-5,
-            area_inside=160
-                 )
-wall.branches_loss = [{'alpha': 23, 'el':outside}]
-for t in range(1, seconds):
-    print('SECOND: ', t)
-    wall.start_calc(power)
-    print(wall.temp)
-    print(wall.dTx_list)
-plt.plot(range(0,len(wall.dTx_list)), wall.dTx_list, lw=2)
-#plt.ylim(19, 21)
-plt.xlabel('t')
-plt.ylabel('v')
-plt.show()
+    name='outside',
+    temp0=18,
+    area_inside=0.06,
+    input_alpha=alpha_out
+)
+
+mass.branches_loss =[outside]
+
+mass_model = Model(name='power_to_mass')
+mass_model.elements = {
+    'mass': mass,
+    'outside': outside
+}
+mass_model.start_element = mass
+mass_model.outside_elements = [outside]
+mass_model.initial_conditions = {
+    'mass': 20,
+
+}
+mass_model.plots = [mass]
+power = 50
+seconds = 60 * 60
+dt = 10
+count = int(seconds / dt)
+
+mass_model.start(count, dt, power, t_out=15)
+
+print(mass.temp)
+
