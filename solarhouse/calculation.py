@@ -45,30 +45,11 @@ class Calculation:
             os.makedirs(self.output_file_dir)
         self.timezone = pytz.timezone(tz)
         self.tz = pytz.timezone(tz)
-        self.day_dict_powers = {}
-        self.month_dict_powers = {}
-        self.year_dict_powers = {}
-        self.day_dict_temp = {}
-        self.month_dict_temp = {}
-        self.year_dict_temp = {}
-        self.sum_watt_hour = 0
-        self.dict_data_for_export = {
-            'power': {
-                'day': self.day_dict_powers,
-                'month': self.month_dict_powers,
-                'year': self.year_dict_powers
-            },
-            'temperature': {
-                'day': self.day_dict_temp,
-                'month': self.month_dict_temp,
-                'year': self.year_dict_temp
-            }
-        }
+        self.pd_data_for_export = None
         self.headers = {
             'power': ['day', 'sum_watt_hour'],
             'temperature': ['day', 'temp in', 'temp out']
         }
-        self.dict_temperature_outside = kwargs.get('temperature_outside', None)
         self.building = Building(
             path_file_object,
             geo,
@@ -79,7 +60,7 @@ class Calculation:
             efficiency_collector,
             efficient_angle_collector,
             windows={'area': 12.0, 'therm_r': 0.5},
-            heat_accumulator={'volume': 1.0, 'density': 996.0},
+            heat_accumulator={'volume': 1.0, 'material': 'water'},
             floor={'t_out': 4.0,
                    'material': wall_material,
                    'layers': [{
@@ -91,75 +72,12 @@ class Calculation:
             }
         )
 
-    def __calc_day(self, date: datetime = datetime.datetime.now()):
-        """ Calculate sun power and temperature inside building. """
-        temperature_out = -20
-        hour_powers_tuple = self.building.get_dict_power_by_hours()
-        self.sum_watt_hour += hour_powers_tuple[3]
-        # TODO get temperature_out = archive_temperatures[year][month][date]
-        power_house_heat_lost = self.building.calc_power_lost()
-        self.building.calc_temp_in_house(
-            power_house_heat_lost,
-            hour_powers_tuple[3])
-        temperature_in = self.building.current_temp
-        if hour_powers_tuple != (0, 0, 0, 0.0):
-            self.day_dict_powers.update({h: [
-                hour_powers_tuple,
-                self.sum_watt_hour
-            ]})
-            self.day_dict_temp.update({h: [
-                0,
-                (temperature_in, temperature_out)
-            ]})
-
-        return
-        
-    def __calc_month(
-            self,
-            month: int = datetime.datetime.now().month,
-            year: int = datetime.datetime.now().year
-            ) -> None:
-        """ Calculate power by day in month. """
-        days = calendar.monthrange(year, month)[1]
-        for d in range(1, days):
-            self.progress = d * 100 // days
-            date = datetime.datetime(day=d, month=month, year=year)
-            self.__calc_day(date, month, year)
-            self.month_dict_powers.update({d: [
-                self.day_dict_powers,
-                self.sum_watt_hour,
-            ]})
-            self.month_dict_temp.update({d: [
-                self.day_dict_temp,
-                (self.building.current_temp, 0)
-            ]})
-        return
-            
-    def __calc_year(
-            self,
-            year=datetime.datetime.now().year
-            ) -> None:
-        """ Calculate powers by months in year. """
-        for m in range(1, 12):
-            self.progress = m*100//12
-            self.__calc_month(m, year)
-            self.year_dict_powers.update({m: [
-                self.month_dict_powers,
-                self.sum_watt_hour,
-            ]})
-            self.year_dict_temp.update({m: [
-                self.month_dict_temp,
-                (self.building.current_temp, 0)
-            ]})
-        return
-
     def __get_weather(self, start, end):
         """
         Get weather data for period.
-        :parameters:
-            start - pd.Timestamp, begin of period
-            end - pd.Timestamp, end of period
-        :retuns: pd.DataFrame,
+        :param start: - pd.Timestamp, begin of period
+        :param end: - pd.Timestamp, end of period
+        :return: pd.DataFrame,
             Column names are: ``ghi, dni, dhi``
         """
         fx_model = GFS()
@@ -171,22 +89,19 @@ class Calculation:
             start,
             end)
 
-
     def __get_clear_sky(self, start, end, model='ineichen'):
         """
         Get sun data of irradiation of sun without weather.
-        :parameters:
-            start - pd.Timestamp, begin of period
-            end - pd.Timestamp, end of period
-            model - str, The clear sky model to use. Must be one of
+        :param start: - pd.Timestamp, begin of period
+        :param end: - pd.Timestamp, end of period
+        :param model: - str, The clear sky model to use. Must be one of
             'ineichen', 'haurwitz', 'simplified_solis'.
-        :retuns: pd.DataFrame,
+        :return: pd.DataFrame,
             Column names are: ``ghi, dni, dhi``
         """
         period = pd.date_range(start=start, end=end, freq='1h', tz=self.tz)
         return self.building.location.get_clearsky(period,model=model)
 
-        
     def create_html(self, what: str, period: str) -> None:
         """ Create HTML page with graphics. """
         dict_data = self.dict_data_for_export[what][period]
@@ -227,32 +142,29 @@ class Calculation:
             date = datetime.datetime.now()
             start = pd.Timestamp(date, tz=self.tz)
             end = start + pd.Timedelta(days=7)
-        #print(start)
-        #print(end)
         self.building.weather_data = get_weather(start, end)
-        print(self.building.weather_data.index)
         self.building.calc_sun_power_on_faces()
-        #dict_walling = self.building.prepare_dict_wallings()
-        t_proc = ThermalProcess(20, self.building)
-        t_proc.run_process()
-        #
-        # self.building.calc_temp_in_house()
+        thermal_process = ThermalProcess(
+            t_start=20,
+            building=self.building,
+            variant='heat_to_mass',
+            for_plots=['mass', 'room']
+        )
+        self.pd_data_for_export = thermal_process.run_process()
         return
 
     def export(
             self,
             what: str,
-            period: str,
             type_file: str = 'csv',
             path: str = '') -> None:
         """ Export results to file. """
-        if what not in ['temperature', 'power']:
-            return
+        if what != 'summ_solar_power' and what != 'temp_air' and what not in self.building.thermal_elements:
+            return False
         if not path:
             path = self.output_file_dir
         header = self.headers[what]
-        header[0] = period
-        dict_data = self.dict_data_for_export[what][period]
+        dict_data = self.dict_data_for_export[what]
         file_path = os.path.join(path, '%ss.%s' % (what, type_file))
         with open(file_path, "w", newline='') as file:
             if type_file == 'csv':
@@ -267,3 +179,8 @@ class Calculation:
                 pass
 
         return
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

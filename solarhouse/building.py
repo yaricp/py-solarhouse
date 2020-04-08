@@ -113,6 +113,7 @@ class Building:
     >>> date = datetime.datetime(day=22, month=6, year=2020)
 
     """
+    thermal_elements = ['mass', 'room', 'wall', 'walls_mass', 'floor', 'windows', 'outside', 'fl_out']
 
     def __init__(
                 self,
@@ -408,7 +409,7 @@ class Building:
     def calc_sun_power_on_faces(self) -> None:
         """
         Calculates the power of sun on all faces of the building.
-        :returns: self
+        :return: self
             changed self.power_data, self.power_data_by_days
         """
         dict_temp_data = {}
@@ -441,10 +442,10 @@ class Building:
                 index += 1
         self.power_data = pd.DataFrame(dict_temp_data)
         fields = list(self.power_data)
-        self.power_data['summ'] = self.power_data[fields].sum(axis=1)
-        self.power_data['maximum'] = self.power_data[fields].max(axis=1)
+        self.power_data['summ_solar_power'] = self.power_data[fields].sum(axis=1)
+        self.power_data['maximum_solar_power'] = self.power_data[fields].max(axis=1)
         self.power_data['ind_face'] = self.power_data[fields].idxmax(axis=1)
-        self.power_data_by_days = self.power_data['summ'].resample('1D').mean()
+        self.power_data_by_days = self.power_data['summ_solar_power'].resample('1D').mean()
         return
 
     def get_prop(self, material: str, prop: str) -> float:
@@ -459,7 +460,6 @@ class Building:
         if prop == "kappa":
             return self.dict_properties_materials[material]['transcalency']
         return self.dict_properties_materials[material][prop]
-
 
 
 if __name__ == "__main__":

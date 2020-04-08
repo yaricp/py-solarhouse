@@ -1,4 +1,4 @@
-PATH_FILE_OBJECT = './files/cube2.stl'
+PATH_FILE_OBJECT = './files/cube.stl'
 TIME_TICK = 1    #1 hours
 WALL_THICKNESS = 0.3
 TEMPERATURE_START = 20  #celcium
