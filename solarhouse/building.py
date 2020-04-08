@@ -112,7 +112,6 @@ class Building:
     >>> import datetime, pytz
     >>> date = datetime.datetime(day=22, month=6, year=2020)
 
-
     """
 
     def __init__(
@@ -176,8 +175,8 @@ class Building:
 
         self.__correct_wall_thickness()
 
-        self.weather_data = None
-        self.power_data = None
+        self.weather_data = {}
+        self.power_data = {}
         self.power_data_by_days = None
         self.location = Location(
             latitude=geo['latitude'],
@@ -313,7 +312,6 @@ class Building:
     def floor_area_outside(self) -> float:
         """Calculates area floor outside of the house"""
         area = 0
-        #print(slice.to_planar().__dict__)
         for norm, area_f in zip(self.mesh.face_normals, self.mesh.area_faces):
             if norm[2] == -1:
                 area += area_f
@@ -449,77 +447,19 @@ class Building:
         self.power_data_by_days = self.power_data['summ'].resample('1D').mean()
         return
 
-    def get_prop(self, material: str, prop: float) -> float:
+    def get_prop(self, material: str, prop: str) -> float:
         """
         Retrive a value of property for some materials.
         :param material: string of name material
         :param prop: string of name property
         :return: float of value property
         """
-        if not material in self.dict_properties_materials:
+        if material not in self.dict_properties_materials:
             material = self.material
         if prop == "kappa":
             return self.dict_properties_materials[material]['transcalency']
         return self.dict_properties_materials[material][prop]
 
-    def prepare_dict_wallings(self):
-        """Prepares dictionary layers of wallings."""
-
-        if not self.therm_r and not self.wall_layers:
-            self.wall_layers = [{
-                'thickness': self.wall_thickness,
-                'c': self.dict_properties_materials[self.material]['heat_capacity'],
-                'lambda': self.dict_properties_materials[self.material]['transcalency'],
-                'mass': self.mass_walls
-                }]
-        dict_walls = {
-            'area': self.walls_area,
-            'therm_r': self.therm_r,
-            'layers': self.wall_layers
-            }
-        if (
-                self.floor['area']
-                and ('therm_r' not in self.floor or not self.floor['therm_r'])
-                and not self.floor['layers']
-            ):
-            mat = self.floor['material']
-            if not mat:
-                mat = self.material
-            self.floor['layers'] = [{
-                'thickness': self.wall_thickness,
-                'lambda': self.dict_properties_materials[mat]['transcalency'],
-                'c': self.dict_properties_materials[mat]['heat_capacity'],
-                'mass': (
-                    self.floor['area']
-                    * self.floor['thickness']
-                    * self.dict_properties_materials[mat]['density']
-                    )
-                }]
-        if (
-                self.ceiling['area']
-                and ('therm_r' not in self.ceiling or not self.ceiling['therm_r'])
-                and not self.ceiling['layers']
-            ):
-            mat = self.ceiling['material']
-            if not mat:
-                mat = self.material
-            self.ceiling['layers'] = [{
-                    'thickness': self.wall_thickness,
-                    'lambda': self.dict_properties_materials[mat]['transcalency'],
-                    'c': self.dict_properties_materials[mat]['heat_capacity'],
-                    'mass': (
-                        self.ceiling['area']
-                        * self.ceiling['thickness']
-                        * self.dict_properties_materials[mat]['density']
-                    )
-                }]
-        dict_wallings = {
-            'windows': self.windows,
-            'floor': self.floor,
-            'ceiling': self.ceiling,
-            'walls': dict_walls,
-            }
-        return dict_wallings
 
 
 if __name__ == "__main__":

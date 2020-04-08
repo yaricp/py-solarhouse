@@ -8,9 +8,8 @@ import uuid
 import csv
 
 import pandas as pd
-from pvlib.forecast import GFS, NAM, NDFD, HRRR, RAP
+from pvlib.forecast import GFS
 
-#from .sun import Sun
 from .building import Building
 from .thermo import ThermalProcess
 
@@ -45,7 +44,6 @@ class Calculation:
         if not os.path.exists(self.output_file_dir):
             os.makedirs(self.output_file_dir)
         self.timezone = pytz.timezone(tz)
-        #self.sun = Sun(geo, tz, with_weather)
         self.tz = pytz.timezone(tz)
         self.day_dict_powers = {}
         self.month_dict_powers = {}
@@ -114,38 +112,6 @@ class Calculation:
                 (temperature_in, temperature_out)
             ]})
 
-        return
-
-    def __calc_day_old(
-            self,
-            date: datetime = datetime.datetime.now(),
-            month: int = datetime.datetime.now().month,
-            year: int = datetime.datetime.now().year
-            ) -> None:
-        """ Calculate sun power and temperature inside building. """
-        temperature_out = -20
-        if self.dict_temperature_outside:
-            temperature_out = self.dict_temperature_outside[date]
-        for h in range(0, 24):
-            self.progress = h * 100 // 24
-            self.sun.change_position(date, h, 0)
-            hour_powers_tuple = self.building.calc_sun_power_on_faces(self.sun)
-            self.sum_watt_hour += hour_powers_tuple[3]
-            # TODO get temperature_out = archive_temperatures[year][month][date]
-            power_house_heat_lost = self.building.calc_power_lost(temperature_out)
-            self.building.calc_temp_in_house(
-                                            power_house_heat_lost,
-                                            hour_powers_tuple[3])
-            temperature_in = self.building.current_temp
-            if hour_powers_tuple != (0, 0, 0, 0.0):
-                self.day_dict_powers.update({h: [
-                    hour_powers_tuple,
-                    self.sum_watt_hour
-                ]})
-                self.day_dict_temp.update({h: [
-                    0,
-                    (temperature_in, temperature_out)
-                ]})
         return
         
     def __calc_month(

@@ -47,3 +47,4 @@ output/
 *.db*
 .DS_Store*
 solarhouse/output/
+.idea/

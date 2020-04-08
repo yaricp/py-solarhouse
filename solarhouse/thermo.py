@@ -1,9 +1,8 @@
-from scipy.integrate import *
-import numpy as np
 import matplotlib.pyplot as plt
 
 from .thermoelement import Element
 from .thermomodel import Model
+from .building import Building
 
 
 class ThermalProcess:
@@ -19,9 +18,8 @@ class ThermalProcess:
     def __init__(
             self,
             t_start: float,
-            building: object,
-            variant: str = 'all_heat_inside',
-            **kwargs) -> None:
+            building: Building,
+            variant: str = 'all_heat_inside') -> None:
         """
         Initialize item of thermo calculation.
         c - ;
@@ -54,11 +52,13 @@ class ThermalProcess:
         self.dx = 0.005     # meters
         self.heat_accumulator_volume = self.building.heat_accumulator['volume']
         if not self.building.heat_accumulator['volume']:
-            self.heat_accumulator_volume = (self.building.heat_accumulator['mass']
-                                            /self.building.get_prop(
-                                            self.building.heat_accumulator['material'],
-                                            'density')
-                                            )
+            self.heat_accumulator_volume = (
+                    self.building.heat_accumulator['mass']
+                    / self.building.get_prop(
+                        self.building.heat_accumulator['material'],
+                        'density'
+                    )
+                )
 
         mass = Element(
             name='mass',
@@ -169,11 +169,28 @@ class ThermalProcess:
                 'fl_out': fl_outside
             }
             self.model.start_element = mass
-            self.model.outside_elements = [outside,fl_outside]
-            self.model.plots = [mass,room,walls]
-        elif variant == 'power_to air':
-            self.update_func = self.heat_sun
-        elif variant == 'power_to walls':
+            self.model.outside_elements = [outside, fl_outside]
+            self.model.plots = [mass, room, walls]
+        elif variant == 'power_to_air':
+            room.branches_loss = [windows, walls, mass]
+            mass.branches_loss = [floor, walls_mass]
+            walls.branches_loss = [outside]
+            walls_mass.branches_loss = [outside]
+            floor.branches_loss = [fl_outside]
+            self.model.elements = {
+                'mass': mass,
+                'room': room,
+                'wall': walls,
+                'walls_mass': walls_mass,
+                'floor': floor,
+                'windows': windows,
+                'outside': outside,
+                'fl_out': fl_outside
+            }
+            self.model.start_element = room
+            self.model.outside_elements = [outside, fl_outside]
+            self.model.data_plots = [mass, room, walls]
+        elif variant == 'power_to_walls':
             pass
 
     def run_process(self):
@@ -187,12 +204,12 @@ class ThermalProcess:
         list_for_plot = []
         for index in self.sun_power_data.index:
             sun = self.sun_power_data[index]
-            self.t_out = self.weather_data[index]
+            t_out = self.weather_data[index]
             out_list = self.model.start(
                 count=count_dt,
                 dt=dt,
                 power=sun,
-                t_out=self.t_out
+                t_out=t_out
             )
 
             list_for_plot += out_list

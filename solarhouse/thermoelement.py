@@ -20,7 +20,7 @@ class Element:
     Calculation realized on one direction dx (in meters).
     All calculations makes for dt.
     Example calculate temperature of mass of water volume 1 cubic meter in 1 hour and 1 kW power:
-    >>> e  = Element(\
+    >>> e = Element(\
             name='cube_water',\
             temp0=0,\
             density=997,\
@@ -32,7 +32,50 @@ class Element:
     >>> e.start_calc(1000,3600)
     >>> round(e.temp, 3)
     0.864
-
+    >>>
+    Example calculate of wall from birch with dx = 0.01 meter and 1 kW power coming to inside area of element
+    >>> e = Element(\
+            name='birch_wall',\
+            temp0=20.0,\
+            density=700.0,\
+            heat_capacity=1250.0,\
+            dx=0.01,\
+            thickness=0.20,\
+            kappa=0.15,\
+            area_inside=1.0,\
+            area_outside=1.1\
+            )
+    >>> e.n
+    20
+    >>> e.dTx_list
+    [20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0,\
+ 20.0]
+    >>> round(e.k_area, 3)
+    0.5
+    >>> e.get_loss_dx(0)
+    0.0
+    >>> e.start_calc(1000, 1)
+    >>> round(e.dTx_list[0], 3)
+    20.114
+    >>> round(e.dTx_list[1], 3)
+    20.0
+    >>> round(e.get_loss_dx(0),3)
+    1.723
+    >>> e.start_calc(1000, 1)
+    >>> round(e.dTx_list[0], 3)
+    20.228
+    >>> round(e.dTx_list[1], 4)
+    20.0002
+    >>>
+    Example element which implementing  thin layer between two areas
+    >>> e = Element(\
+            name='glass',\
+            temp0=20.0,\
+            area_inside=1.0,\
+            input_alpha=23,\
+            )
+    >>> e.calc_loss_input_q(25.0)
+    115.0
     """
 
     def __init__(
@@ -53,7 +96,7 @@ class Element:
         self.thickness = kwargs.get('thickness', None)
         self.kappa = kwargs.get('kappa', 0.04)
         self.layers = kwargs.get('layers', {})
-        self.dx = kwargs.get('dx',None)
+        self.dx = kwargs.get('dx', None)
         self.area_inside = kwargs.get('area_inside', None)
         self.area_outside = kwargs.get('area_outside', None)
         self.input_alpha = kwargs.get('input_alpha', None)
@@ -69,8 +112,10 @@ class Element:
         if (self.area_inside
                 and self.area_outside
                 and self.area_outside > self.area_inside):
-            self.k_area = ((self.area_outside - self.area_inside)
-                 /self.thickness)
+            self.k_area = (
+                (self.area_outside - self.area_inside)
+                / self.thickness
+            )
 
     def init_conditions(self, val):
         """Reduction to initial conditions"""
@@ -135,8 +180,10 @@ class Element:
         temp1 = self.dTx_list[iterator]
         temp2 = self.dTx_list[iterator + 1]
         if temp1 == temp2:
-            return 0
-        area = self.__get_area_dx(iterator)
+            return 0.0
+        area = self.__get_area_dx(iterator + 1)
+        if area > self.area_outside:
+            area = self.area_outside
         kappa = self.__get_kappa_dx(iterator)
         q_loss = (area * (temp1 - temp2)) / (self.dx / kappa)
 
@@ -174,6 +221,7 @@ class Element:
         it represent as a point or calculate of all
         temperatures by dx if element has the dx parameter.
         :param q_enter: input power
+        :param dt: range of time
         :return:
             change self.temp parameter in the end of calculation
         """
