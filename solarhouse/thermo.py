@@ -231,6 +231,7 @@ class ThermalProcess:
             self.sun_power_data,
             self.weather_data
         )
+        print(pd_for_plot)
         dict_for_plot = {}
         for el in self.elements_for_plots:
             dict_for_plot.update({el: []})
@@ -238,7 +239,7 @@ class ThermalProcess:
             # TODO make progress status
             sun = self.sun_power_data[index]
             t_out = self.weather_data[index]
-            out_dict = self.model.start(
+            self.model.start(
                 count=count_dt,
                 dt=dt,
                 power=sun,
@@ -247,13 +248,12 @@ class ThermalProcess:
             for el in self.elements_for_plots:
                 dict_for_plot[el].append(self.model.elements[el].temp)
         for k in dict_for_plot.keys():
-            print(len(dict_for_plot[k]))
-            print(len(self.sun_power_data.index))
-            serie = pd.Series(
+            seria = pd.Series(
                 dict_for_plot[k],
                 self.sun_power_data.index
             )
-            pd_for_plot.append(serie, ignore_index=True)
+            pd_for_plot.append(seria, ignore_index=True)
+            #print(pd_for_plot)
         return pd_for_plot
 
 

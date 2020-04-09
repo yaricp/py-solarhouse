@@ -151,6 +151,7 @@ class Calculation:
             for_plots=['mass', 'room']
         )
         self.pd_data_for_export = thermal_process.run_process()
+
         return
 
     def export(
@@ -163,19 +164,12 @@ class Calculation:
             return False
         if not path:
             path = self.output_file_dir
-        header = self.headers[what]
-        dict_data = self.dict_data_for_export[what]
-        file_path = os.path.join(path, '%ss.%s' % (what, type_file))
+        file_path = os.path.join(path, '%s.%s' % (what, type_file))
         with open(file_path, "w", newline='') as file:
             if type_file == 'csv':
-                writer = csv.writer(file, delimiter=',')
-                writer.writerow(header)
-                for k, data in dict_data.items():
-                    print(data[1])
-                    line = [k, data[1]]
-                    writer.writerow(line)
+                file.write(self.pd_data_for_export.to_csv())
             else:
-                # write json
+                file.write(self.pd_data_for_export.to_json(orient='split'))
                 pass
 
         return
