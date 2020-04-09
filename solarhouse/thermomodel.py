@@ -26,6 +26,11 @@ class Model:
         print(text)
         return
 
+    def make_init_conditions(self) -> None:
+        """Initialize conditions in elements."""
+        for el, val in self.initial_conditions.items():
+            self.elements[el].init_conditions(val)
+
     def start(
             self,
             count: int,
@@ -41,8 +46,6 @@ class Model:
         :return:
             - dict of data of temperatures of elements.
         """
-        for el, val in self.initial_conditions.items():
-            self.elements[el].init_conditions(val)
         for el in self.outside_elements:
             el.temp = t_out
         for i in range(count):

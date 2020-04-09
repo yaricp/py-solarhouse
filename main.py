@@ -21,12 +21,10 @@ def main():
     calc_id = calc.id
     # datetime.datetime.now() , with_weather=False
     calc.start(date=datetime.datetime.now(), with_weather=True)
-    calc.export('power')
-    calc.export('temp_out')
-    calc.export('mass')
-    calc.create_html('power','temp_out', 'mass')
+    calc.export()
+    calc.create_html()
    
-    with open(os.path.join(PATH_OUTPUT, calc_id, 'powers.csv'), 'r') as file:
+    with open(os.path.join(PATH_OUTPUT, calc_id, 'data.csv'), 'r') as file:
         print(file.read())
 
 

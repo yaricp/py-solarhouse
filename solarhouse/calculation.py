@@ -102,17 +102,6 @@ class Calculation:
         period = pd.date_range(start=start, end=end, freq='1h', tz=self.tz)
         return self.building.location.get_clearsky(period,model=model)
 
-    def create_html(self, what: str, period: str) -> None:
-        """ Create HTML page with graphics. """
-        dict_data = self.dict_data_for_export[what][period]
-        data = [item[1] for k, item in dict_data.items()]
-        fig = plt.figure()
-        ax = fig.subplots()
-        ax.plot(data)
-        fileobj = os.path.join(self.output_file_dir, '%s.html' % what)
-        mpld3.save_html(fig, fileobj)
-        return
-
     def start(
             self,
             date=None,
@@ -151,27 +140,28 @@ class Calculation:
             for_plots=['mass', 'room']
         )
         self.pd_data_for_export = thermal_process.run_process()
-
         return
 
-    def export(
-            self,
-            what: str,
-            type_file: str = 'csv',
-            path: str = '') -> None:
+    def export(self, type_file: str = 'csv', path: str = '') -> None:
         """ Export results to file. """
-        if what != 'summ_solar_power' and what != 'temp_air' and what not in self.building.thermal_elements:
-            return False
         if not path:
             path = self.output_file_dir
-        file_path = os.path.join(path, '%s.%s' % (what, type_file))
+        file_path = os.path.join(path, 'data.%s' % type_file)
         with open(file_path, "w", newline='') as file:
             if type_file == 'csv':
                 file.write(self.pd_data_for_export.to_csv())
             else:
                 file.write(self.pd_data_for_export.to_json(orient='split'))
                 pass
+        return
 
+    def create_html(self) -> None:
+        """ Create HTML page with graphics. """
+        fig = plt.figure()
+        ax = fig.subplots()
+        ax.plot(self.pd_data_for_export)
+        file_obj = os.path.join(self.output_file_dir, 'plots.html')
+        mpld3.save_html(fig, file_obj)
         return
 
 

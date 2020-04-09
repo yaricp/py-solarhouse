@@ -83,7 +83,7 @@ class ThermalProcess:
         self.building = building
         self.t_start = t_start
         self.elements_for_plots = for_plots
-        self.sun_power_data = self.building.power_data['summ_solar_power'].resample('1h').interpolate()
+        self.sun_power_data = self.building.power_data['sum_solar_power'].resample('1h').interpolate()
         self.weather_data = self.building.weather_data['temp_air'].resample('1h').interpolate()
 
         self.alpha_room = 1/0.13
@@ -192,10 +192,11 @@ class ThermalProcess:
             input_alpha=self.alpha_out
         )
 
-        self.model = Model(name=variant)
         walls.branches_loss = [outside]
         walls_mass.branches_loss = [outside]
         floor.branches_loss = [fl_outside]
+
+        self.model = Model(name=variant)
         self.model.elements = {
             'mass': mass,
             'room': room,
@@ -206,15 +207,23 @@ class ThermalProcess:
             'outside': outside,
             'fl_out': fl_outside
         }
-        self.model.start_element = room
-        self.model.outside_elements = [outside, fl_outside]
+        self.model.initial_conditions = {
+            'mass': self.t_start,
+            'room': self.t_start,
+            'wall': self.t_start,
+            'walls_mass': self.t_start,
+            'floor': self.t_start
+        }
+        self.model.outside_elements = [outside]
 
         if variant == 'heat_to_mass':
             mass.branches_loss = [room, floor, walls_mass]
             room.branches_loss = [windows, walls]
+            self.model.start_element = mass
         elif variant == 'heat_to_air':
             room.branches_loss = [windows, walls, mass]
             mass.branches_loss = [floor, walls_mass]
+            self.model.start_element = room
         elif variant == 'heat_to_walls':
             pass
 
@@ -227,16 +236,18 @@ class ThermalProcess:
         self.seconds = 60 * 60
         dt = 5
         count_dt = int(self.seconds / dt)
-        pd_for_plot = pd.DataFrame(
-            self.sun_power_data,
-            self.weather_data
-        )
-        print(pd_for_plot)
+        pd_for_plot = pd.DataFrame(self.sun_power_data)
+        pd_for_plot.insert(1, 'temp_air', self.weather_data)
         dict_for_plot = {}
-        for el in self.elements_for_plots:
-            dict_for_plot.update({el: []})
+        self.model.make_init_conditions()
+        for name, el in self.model.elements.items():
+            print(name, ': ', el.temp)
+        for el_name in self.elements_for_plots:
+            dict_for_plot.update({el_name: []})
         for index in self.sun_power_data.index:
             # TODO make progress status
+            for el in self.elements_for_plots:
+                dict_for_plot[el].append(self.model.elements[el].temp)
             sun = self.sun_power_data[index]
             t_out = self.weather_data[index]
             self.model.start(
@@ -245,15 +256,14 @@ class ThermalProcess:
                 power=sun,
                 t_out=t_out
             )
-            for el in self.elements_for_plots:
-                dict_for_plot[el].append(self.model.elements[el].temp)
+        count = 1
         for k in dict_for_plot.keys():
+            count += 1
             seria = pd.Series(
                 dict_for_plot[k],
                 self.sun_power_data.index
             )
-            pd_for_plot.append(seria, ignore_index=True)
-            #print(pd_for_plot)
+            pd_for_plot.insert(count, k, seria)
         return pd_for_plot
 
 

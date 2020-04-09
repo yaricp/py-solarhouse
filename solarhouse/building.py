@@ -442,10 +442,10 @@ class Building:
                 index += 1
         self.power_data = pd.DataFrame(dict_temp_data)
         fields = list(self.power_data)
-        self.power_data['summ_solar_power'] = self.power_data[fields].sum(axis=1)
+        self.power_data['sum_solar_power'] = self.power_data[fields].sum(axis=1)
         self.power_data['maximum_solar_power'] = self.power_data[fields].max(axis=1)
         self.power_data['ind_face'] = self.power_data[fields].idxmax(axis=1)
-        self.power_data_by_days = self.power_data['summ_solar_power'].resample('1D').mean()
+        self.power_data_by_days = self.power_data['sum_solar_power'].resample('1D').mean()
         return
 
     def get_prop(self, material: str, prop: str) -> float:
