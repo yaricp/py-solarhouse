@@ -10,8 +10,8 @@ import csv
 import pandas as pd
 from pvlib.forecast import GFS
 
-from .building import Building
-from .thermo import ThermalProcess
+from building import Building
+from thermo import ThermalProcess
 
 
 class Calculation:

@@ -1,8 +1,8 @@
 import pandas as pd
 
-from .thermoelement import Element
-from .thermomodel import Model
-from .building import Building
+from thermoelement import Element
+from thermomodel import Model
+from building import Building
 
 
 class ThermalProcess:
