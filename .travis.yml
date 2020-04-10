@@ -6,4 +6,4 @@ install:
   - pip install -r requirements.txt
 # command to run tests
 script:
-  - PYTHONPATH=./solarhouse venv3/bin/pytest --collect-in-virtualenv -vv -l solarhouse/test
+  - PYTHONPATH=./solarhouse pytest --collect-in-virtualenv -vv -l solarhouse/test
