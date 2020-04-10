@@ -1,5 +1,6 @@
 from thermoelement import Element
 
+
 e = Element(
             name='cube_water',
             temp0=0,
@@ -42,3 +43,5 @@ e = Element(
         input_alpha=23,
         )
 assert e.calc_loss_input_q(25.0) == 115.0
+
+pass
