@@ -1,3 +1,4 @@
 #!/bin/bash -e
 
-PYTHONPATH=./solarhouse venv3/bin/pytest --doctest-modules -vv -l solarhouse/test
+export PYTHONPATH=./solarhouse
+venv3/bin/pytest --collect-in-virtualenv -vv -l solarhouse/test

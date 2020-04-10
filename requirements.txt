@@ -13,5 +13,6 @@ netCDF4
 siphon
 tables
 cftime==1.0.3.4
+networkx
 
 pytest
