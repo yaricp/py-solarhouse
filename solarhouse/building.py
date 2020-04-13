@@ -72,7 +72,6 @@ class Building:
         wall_thickness=0.3,\
         wall_material='birch',\
         properties_materials=material)
-    building ready
     >>> import os
     >>> os.remove('test_file.obj')
     >>> b.wall_thickness
@@ -121,7 +120,6 @@ class Building:
                 start_temp_in: float = 20,
                 power_heat_inside: float = 0,
                 efficiency: float = 60,
-                effective_angle: float = 65,
                 cover_material: str = None,
                 **kwargs
                 ) -> None:
@@ -139,7 +137,6 @@ class Building:
         # power_heat_inside kWatt
         self.power_heat_inside = power_heat_inside * 1000
         self.efficiency = efficiency
-        self.effective_angle = effective_angle
         self.cover_material = cover_material
         self.dict_properties_materials = properties_materials
         self.wall_layers = kwargs.get('wall_layers', None)
@@ -191,8 +188,6 @@ class Building:
             self.location,
             aoi_model='no_loss',
             spectral_model='no_loss')
-
-        print('building ready')
         return
 
     def __correct_wall_thickness(self) -> None:

@@ -14,13 +14,12 @@ def main():
                         TEMPERATURE_START, 
                         POWER_HEAT_INSIDE,
                         EFF, 
-                        EFF_ANG, 
-                        PATH_OUTPUT, 
+                        PATH_OUTPUT,
                         mass_inside=0)
     date = datetime.datetime(day=22, month=7, year=2019)
     calc_id = calc.id
-    # datetime.datetime.now() , with_weather=False
-    calc.start(date=datetime.datetime.now(), with_weather=True)
+
+    calc.start(date=22, with_weather=True)
     calc.export()
     calc.create_html()
    
