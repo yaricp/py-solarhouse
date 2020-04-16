@@ -27,6 +27,7 @@ f 6/18/6 5/19/6 1/20/6 2/11/6
     with open('solarhouse/test/test_file.obj', 'a') as file:
         file.write(text)
     print('File ready')
+    return 'solarhouse/test/test_file.obj'
 
 
 def remove_file_mesh():
@@ -100,8 +101,8 @@ def test_perimeter_floor():
     b.heat_accumulator['mass'] = 1
     b.heat_accumulator['density'] = 1000
     assert b.get_perimeter_floor('inside') == 1.6
-    assert round(b.area_mass_walls_inside, 2) == 0.01
-    assert round(b.volume_air_inside, 3) == 0.063
+    assert round(b.area_mass_walls_inside, 2) == 0.2
+    assert round(b.volume_air_inside, 3) == 0.044
     assert b.get_perimeter_floor('outside') == 4.0
-    assert round(b.area_mass_walls_outside, 3) == 1.225
+    assert round(b.area_mass_walls_outside, 3) == 1.7
 

@@ -123,6 +123,7 @@ class ThermalProcess:
                 'heat_capacity'),
             input_alpha=self.alpha_room
         )
+
         walls_mass = Element(
             name='walls_mass',
             temp0=self.t_start,

@@ -32,7 +32,8 @@ class Element:
     >>> round(e.temp, 3)
     0.864
     >>>
-    Example calculate of wall from birch with dx = 0.01 meter and 1 kW power coming to inside area of element
+    Example calculate of wall from birch with dx = 0.01 meter and 1 kW power coming to inside area of element.
+    Result of test calculated manually.
     >>> e = Element(\
             name='birch_wall',\
             temp0=20.0,\

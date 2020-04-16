@@ -38,7 +38,6 @@ src/.idea
 
 venv/
 venv3/
-files/
 output/
 /.eric6project/
 *.e4p

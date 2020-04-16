@@ -98,13 +98,13 @@ class Building:
     >>> b.get_perimeter_floor('inside')
     1.6
     >>> round(b.area_mass_walls_inside, 2)
-    0.01
+    0.2
     >>> round(b.volume_air_inside, 3)
-    0.063
+    0.044
     >>> b.get_perimeter_floor('outside')
     4.0
     >>> round(b.area_mass_walls_outside, 3)
-    1.225
+    1.7
     >>> import datetime, pytz
     >>> date = datetime.datetime(day=22, month=6, year=2020)
 
@@ -121,6 +121,10 @@ class Building:
                 power_heat_inside: float = 0,
                 efficiency: float = 60,
                 cover_material: str = None,
+                heat_accumulator: dict = {
+                    'volume': 0.02,
+                    'material': 'water'
+                },
                 **kwargs
                 ) -> None:
         """ Initialize object of class Building. """
@@ -146,7 +150,7 @@ class Building:
             properties_materials
         )
         self.ventilation_losses = kwargs.get('ventilation_losses', 0)
-        self.heat_accumulator = kwargs.get('heat_accumulator', {})
+        self.heat_accumulator = heat_accumulator
         self.windows = kwargs.get('windows', {
             'therm_r': 0.0,
             'losses': 0.0,

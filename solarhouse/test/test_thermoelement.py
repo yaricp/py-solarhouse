@@ -2,6 +2,7 @@ from thermoelement import Element
 
 
 def test_cube_water():
+    """Test cube water as a thermal point. Result of test calculated manually."""
     e = Element(
             name='cube_water',
             temp0=0,
@@ -10,11 +11,17 @@ def test_cube_water():
             volume=1
             )
     assert e.n == 1
-    e.start_calc(1000,3600)
+    e.start_calc(1000, 3600)
     assert round(e.temp, 3) == 0.864
 
+
 def test_wall_birch():
-    """Example calculate of wall from birch with dx = 0.01 meter and 1 kW power coming to inside area of element."""
+    """
+    Example calculate of wall from birch with dx = 0.01
+    meter and 1 kW power coming to inside area of element.
+    All result for test calculated manually.
+    In this test made two circle of calculation of all 20 point of wall.
+    """
     e = Element(
             name='birch_wall',
             temp0=20.0,
@@ -27,8 +34,8 @@ def test_wall_birch():
             area_outside=1.1
             )
     assert e.n == 20
-    assert e.dTx_list == [20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0,\
-                          20.0, 20.0, 20.0, 20.0]
+    assert e.dTx_list == [20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0,\
+                          20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0]
     assert round(e.k_area, 3) == 0.5
     assert e.get_loss_dx(0) == 0.0
     e.start_calc(1000, 1)

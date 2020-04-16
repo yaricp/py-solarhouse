@@ -1,8 +1,7 @@
 import os
 import datetime
 import pytz
-import matplotlib.pyplot as plt
-import mpld3
+
 import uuid
 
 import pandas as pd
@@ -10,6 +9,7 @@ from pvlib.forecast import GFS
 
 from building import Building
 from thermo import ThermalProcess
+from helpers import prepare_period
 
 
 class Calculation:
@@ -30,16 +30,12 @@ class Calculation:
                 start_temp_in: float,
                 power_heat_inside: float = 0.0,
                 efficiency_collector: float = None,
-                path_output_file: str = 'output',
                 **kwargs
                 ):
         """ Initialize object for calculate sun power. """
         self.id = str(uuid.uuid4())
         self.progress = 0
-        self.output_file_dir = os.path.join(path_output_file, self.id)
         self.geo = geo
-        if not os.path.exists(self.output_file_dir):
-            os.makedirs(self.output_file_dir)
         self.tz = pytz.timezone(tz)
         self.pd_data_for_export = None
         self.headers = {
@@ -54,17 +50,7 @@ class Calculation:
             start_temp_in,
             power_heat_inside,
             efficiency_collector,
-            windows={'area': 12.0, 'therm_r': 0.5},
-            heat_accumulator={'volume': 1.0, 'material': 'water'},
-            floor={'t_out': 4.0,
-                   'material': wall_material,
-                   'layers': [{
-                    'thickness': 0.1,
-                    'lambda':0.04,
-                    'c': 4500,
-                    'mass': 2000,
-                }]
-            }
+            **kwargs
         )
 
     def __get_weather(self, start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame:
@@ -95,39 +81,6 @@ class Calculation:
         period = pd.date_range(start=start, end=end, freq='1h', tz=self.tz)
         return self.building.location.get_clearsky(period, model=model)
 
-    def prepare_period(self,
-                       date: datetime.datetime = None,
-                       month: datetime.datetime = None,
-                       year: datetime.datetime = None,
-                       period: tuple = None,
-                       ) -> tuple:
-        if year and not month and not date:
-            year = datetime.datetime(day=1, month=1, year=year)
-            start = pd.Timestamp(year, tz=self.tz)
-            end = start + pd.Timedelta(days=365)
-        elif month and not date:
-            if not year:
-                year = datetime.datetime.now().year
-            month = datetime.datetime(day=1, month=month, year=year)
-            start = pd.Timestamp(month, tz=self.tz)
-            end = start + pd.Timedelta(days=31)
-        elif date:
-            if not year:
-                year = datetime.datetime.now().year
-            if not month:
-                month = datetime.datetime.now().month
-            date = datetime.datetime(day=date, month=month, year=year)
-            start = pd.Timestamp(date, tz=self.tz)
-            end = start + pd.Timedelta(days=1)
-        elif period:
-            start = pd.Timestamp(period[0], tz=self.tz)
-            end = pd.Timestamp(period[1], tz=self.tz)
-        else:
-            date = datetime.datetime.now()
-            start = pd.Timestamp(date, tz=self.tz)
-            end = start + pd.Timedelta(days=1)
-        return start, end
-
     def start(
             self,
             date: datetime.datetime = None,
@@ -137,8 +90,8 @@ class Calculation:
             with_weather: bool = True
             ) -> None:
         """ proxy method for prepare period and calculations. """
-        start, end = self.prepare_period(date=date, month=month, year=year, period=period)
-        self.start_calculation(start, end, with_weather=with_weather)
+        start, end = prepare_period(tz=self.tz, date=date, month=month, year=year, period=period)
+        return self.start_calculation(start, end, with_weather=with_weather)
 
     def start_calculation(self, start: pd.Timestamp, end: pd.Timestamp, with_weather: bool = True) -> None:
         """ Start calculations. """
@@ -154,28 +107,7 @@ class Calculation:
             for_plots=['mass', 'room']
         )
         self.pd_data_for_export = thermal_process.run_process()
-
-    def export(self, type_file: str = 'csv', path: str = '') -> None:
-        """ Export results to file. """
-        if not path:
-            path = self.output_file_dir
-        file_path = os.path.join(path, 'data.%s' % type_file)
-        with open(file_path, "w", newline='') as file:
-            if type_file == 'csv':
-                file.write(self.pd_data_for_export.to_csv())
-            else:
-                file.write(self.pd_data_for_export.to_json(orient='split'))
-                pass
-        return
-
-    def create_html(self) -> None:
-        """ Create HTML page with graphics. """
-        fig = plt.figure()
-        ax = fig.subplots()
-        ax.plot(self.pd_data_for_export)
-        file_obj = os.path.join(self.output_file_dir, 'plots.html')
-        mpld3.save_html(fig, file_obj)
-        return
+        return self.pd_data_for_export
 
 
 if __name__ == "__main__":
