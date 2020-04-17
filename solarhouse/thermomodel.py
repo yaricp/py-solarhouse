@@ -1,5 +1,4 @@
 
-
 class Model:
     """
     Class implements process of calculation of some model
@@ -51,4 +50,3 @@ class Model:
             self.start_element.start_calc(power, dt)
         # TODO  make return data elements by dx for plots
         return
-

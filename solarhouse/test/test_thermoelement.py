@@ -2,7 +2,10 @@ from thermoelement import Element
 
 
 def test_cube_water():
-    """Test cube water as a thermal point. Result of test calculated manually."""
+    """
+    Test cube water as a thermal point.
+    Result of test calculated manually.
+    """
     e = Element(
             name='cube_water',
             temp0=0,
@@ -34,8 +37,10 @@ def test_wall_birch():
             area_outside=1.1
             )
     assert e.n == 20
-    assert e.dTx_list == [20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0,\
-                          20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0]
+    assert e.dTx_list == [
+        20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0,
+        20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0
+    ]
     assert round(e.k_area, 3) == 0.5
     assert e.get_loss_dx(0) == 0.0
     e.start_calc(1000, 1)
@@ -56,4 +61,3 @@ def test_thin_layer():
             input_alpha=23,
             )
     assert e.calc_loss_input_q(25.0) == 115.0
-

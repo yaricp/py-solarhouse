@@ -9,34 +9,39 @@ class ThermalProcess:
     """
     Class implements all calculations of thermal processes in house.
     There are three main models of house:
-    1. All solar power (with efficient for water solar collector) comes to inside the massive in the house.
-    2. All solar power (with efficient for air solar collector) comes to inside the volume in the house.
+    1. All solar power (with efficient for water solar collector) comes
+    to inside the massive in the house.
+    2. All solar power (with efficient for air solar collector) comes
+    to inside the volume in the house.
     3. All solar power comes inside the walls through glass dome.
     """
 
     def __init__(
-            self,
-            t_start: float,
-            building: Building,
-            variant: str = 'heat_to_mass',
-            for_plots: list = ['mass',]
-        ) -> None:
+                self,
+                t_start: float,
+                building: Building,
+                variant: str = 'heat_to_mass',
+                for_plots: list = ['mass']
+            ) -> None:
         """
         Initialize item of thermo calculation.
         c - ;
         1,007 - Specific heat capacity of air (wikipedia)
         1,1839 - Density of air (wikipedia)
         There are creating all main thermo elements of the building:
-        1. Massive object inside the building (It is model of any massive objects: water boiler, hot floor ,etc.)
+        1. Massive object inside the building
+        (It is model of any massive objects: water boiler, hot floor ,etc.)
         2. Air inside the building.
         3. Walls (without windows).
         4. Windows (if area of windows set in building).
         5. Floor.
         6. Area walls around the massive object.
         7. Outside  - temperature of air around the building.
-        8. Floor outside - temperature of air under the floor under the insulation
+        8. Floor outside - temperature of air under the floor
+        under the insulation
         9. Glass dome around the building.
-        This elements can be combined to three variant (power to massive object, power to air, power to walls).
+        This elements can be combined to three variant
+        (power to massive object, power to air, power to walls).
         dx for non-homogeneous elements is in meters.
 
         """
@@ -45,8 +50,10 @@ class ThermalProcess:
         self.building = building
         self.t_start = t_start
         self.elements_for_plots = for_plots
-        self.sun_power_data = self.building.power_data['sum_solar_power'].resample('1h').interpolate()
-        self.weather_data = self.building.weather_data['temp_air'].resample('1h').interpolate()
+        self.sun_power_data = self.building.power_data['sum_solar_power']\
+            .resample('1h').interpolate()
+        self.weather_data = self.building.weather_data['temp_air']\
+            .resample('1h').interpolate()
 
         self.alpha_room = 1/0.13
         self.alpha_out = 1/0.04
@@ -59,8 +66,8 @@ class ThermalProcess:
                     )
         if not self.building.heat_accumulator['volume']:
             self.heat_accumulator_volume = (
-                    self.building.heat_accumulator['mass']
-                    / self.heat_accumulator_density
+                    self.building.heat_accumulator['mass'] /
+                    self.heat_accumulator_density
                 )
 
         mass = Element(
@@ -228,4 +235,3 @@ class ThermalProcess:
             )
             pd_for_plot.insert(count, k, seria)
         return pd_for_plot
-

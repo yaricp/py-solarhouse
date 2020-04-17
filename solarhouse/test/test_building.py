@@ -105,4 +105,3 @@ def test_perimeter_floor():
     assert round(b.volume_air_inside, 3) == 0.044
     assert b.get_perimeter_floor('outside') == 4.0
     assert round(b.area_mass_walls_outside, 3) == 1.7
-

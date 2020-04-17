@@ -18,7 +18,8 @@ class Element:
     and with variable thermal resistance on each dx.
     Calculation realized on one direction dx (in meters).
     All calculations makes for dt.
-    Example calculate temperature of mass of water volume 1 cubic meter in 1 hour and 1 kW power:
+    Example calculate temperature of mass of water volume 1 cubic
+     meter in 1 hour and 1 kW power:
     >>> e = Element(\
             name='cube_water',\
             temp0=0,\
@@ -32,7 +33,8 @@ class Element:
     >>> round(e.temp, 3)
     0.864
     >>>
-    Example calculate of wall from birch with dx = 0.01 meter and 1 kW power coming to inside area of element.
+    Example calculate of wall from birch with dx = 0.01 meter and
+    1 kW power coming to inside area of element.
     Result of test calculated manually.
     >>> e = Element(\
             name='birch_wall',\
@@ -48,8 +50,8 @@ class Element:
     >>> e.n
     20
     >>> e.dTx_list
-    [20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0,\
- 20.0]
+    [20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0,\
+ 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0]
     >>> round(e.k_area, 3)
     0.5
     >>> e.get_loss_dx(0)
@@ -109,12 +111,12 @@ class Element:
             self.n = int(self.thickness/self.dx)
             self.dTx_list = list(np.ones(self.n) * self.temp)
         self.k_area = None
-        if (self.area_inside
-                and self.area_outside
-                and self.area_outside > self.area_inside):
+        if (self.area_inside and
+                self.area_outside and
+                self.area_outside > self.area_inside):
             self.k_area = (
-                (self.area_outside - self.area_inside)
-                / self.thickness
+                (self.area_outside - self.area_inside) /
+                self.thickness
             )
 
     def init_conditions(self, val):
@@ -135,8 +137,10 @@ class Element:
             Float value of area
         """
         if self.k_area:
-            return (self.area_inside
-                    + iterator * self.dx * self.k_area)
+            return (
+                    self.area_inside +
+                    iterator * self.dx * self.k_area
+                )
 
     def __get_kappa_dx(self, iterator):
         """
@@ -163,9 +167,9 @@ class Element:
     def calc_loss_input_q(self, t_in: float) -> float:
         """Calculates loss energy between current and previous elements"""
         return (
-                self.input_alpha
-                * self.area_inside
-                * (t_in - self.temp)
+                self.input_alpha *
+                self.area_inside *
+                (t_in - self.temp)
             )
 
     def get_loss_dx(self, iterator):

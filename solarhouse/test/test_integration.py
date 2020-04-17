@@ -10,8 +10,7 @@ from test_building import create_file_mesh, remove_file_mesh
 def test_main():
     tz = 'Asia/Novosibirsk'
     file_path = create_file_mesh()
-    geo = {'latitude': 54.841426,
-           'longitude': 83.264479}
+    geo = {'latitude': 54.841426, 'longitude': 83.264479}
     output = 'solarhouse/test/output2'
     calc = Calculation(
         tz,

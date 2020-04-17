@@ -4,11 +4,11 @@ import pandas as pd
 
 
 def prepare_period(
-        tz,
-        date: datetime.datetime = None,
-        month: datetime.datetime = None,
-        year: datetime.datetime = None,
-         period: tuple = None,
+            tz,
+            date: datetime.datetime = None,
+            month: datetime.datetime = None,
+            year: datetime.datetime = None,
+            period: tuple = None,
         ) -> tuple:
     if year and not month and not date:
         year = datetime.datetime(day=1, month=1, year=year)

@@ -15,7 +15,7 @@ from trimesh import geometry, load
 
 from settings import *
 
-temperature_model_parameters = TEMPERATURE_MODEL_PARAMETERS['sapm']['open_rack_glass_glass']
+temp_model_pars = TEMPERATURE_MODEL_PARAMETERS['sapm']['open_rack_glass_glass']
 
 properties_materials = {'cob': {
                             'transcalency': 0.04,
@@ -24,7 +24,7 @@ properties_materials = {'cob': {
                         },
                         'water': {
                             'transcalency': 0.599,
-                            'heat_capacity': 4182 ,
+                            'heat_capacity': 4182,
                             'density': 998.29
                         },
                         'birch': {
@@ -40,7 +40,8 @@ properties_materials = {'cob': {
 
 class Building:
     """
-    Class implements methods for work with buildings for which calculate sun energy.
+    Class implements methods for work with buildings for which calculate
+    sun energy.
     Test for cube 1x1x1 meter :
     >>> text = 'o Cube\\n'
     >>> text += 'v 1.000000 1.000000 -1.000000\\n'
@@ -62,7 +63,8 @@ class Building:
             file.write(text)
     418
     >>> geo = {'latitude': 54.841426, 'longitude': 83.264479}
-    >>> vertices = [[0,0,0],[1,0,0],[1,1,0],[0,1,0],[0,1,1],[0,0,1],[1,0,1],[1,1,1]]
+    >>> vertices = [[0,0,0],[1,0,0],[1,1,0],[0,1,0],[0,1,1],[0,0,1],[1,0,1],\
+    [1,1,1]]
     >>> material = {'birch': {\
         'density': 700.0,\
         'transcalency': 0.15,\
@@ -109,7 +111,8 @@ class Building:
     >>> date = datetime.datetime(day=22, month=6, year=2020)
 
     """
-    thermal_elements = ['mass', 'room', 'wall', 'walls_mass', 'floor', 'windows', 'outside', 'fl_out']
+    thermal_elements = ['mass', 'room', 'wall', 'walls_mass', 'floor',
+                        'windows', 'outside', 'fl_out']
 
     def __init__(
                 self,
@@ -185,7 +188,7 @@ class Building:
             surface_azimuth=180,
             module_parameters={'pdc0': 240, 'gamma_pdc': -0.004},
             inverter_parameters={'pdc0': 240},
-            temperature_model_parameters=temperature_model_parameters,
+            temperature_model_parameters=temp_model_pars,
         )
         self.mc = ModelChain(
             self.pv,
@@ -202,7 +205,7 @@ class Building:
                 self.wall_thickness = min(
                     self.mesh.bounding_box.primitive.extents)/2
         return
-        
+
     def __centring(self):
         """ Method for centring of the mesh. """
         where_move = self.mesh.center_mass * -1.0
@@ -231,9 +234,9 @@ class Building:
     def walls_area_inside(self):
         """Calculates area of walls inside the house"""
         area = (
-            self.mesh_inside.area
-            - self.windows['area']
-            - self.floor_area_inside
+            self.mesh_inside.area -
+            self.windows['area'] -
+            self.floor_area_inside
         )
         if area < 0:
             raise Exception('Area is null')
@@ -243,18 +246,18 @@ class Building:
     def walls_area_outside(self):
         """Calculates area of walls outside the house"""
         area = (
-            self.mesh.area
-            - self.windows['area']
-            - self.floor_area_outside
+            self.mesh.area -
+            self.windows['area'] -
+            self.floor_area_outside
         )
         if area < 0:
             raise Exception('Area is null')
         return area
-    
+
     @property
     def face_normals(self) -> list:
         return self.mesh.face_normals
-        
+
     @property
     def face_areas(self) -> list:
         return self.mesh.area_faces
@@ -263,8 +266,8 @@ class Building:
     def volume_air_inside(self) -> float:
         """Calculates volume of the air inside the house"""
         return (
-            self.mesh_inside.volume
-            - self.heat_accumulator_volume
+            self.mesh_inside.volume -
+            self.heat_accumulator_volume
         )
 
     @property
@@ -277,9 +280,15 @@ class Building:
     @property
     def heat_accumulator_volume(self):
         """Get volume of heat accumulator"""
-        if 'volume' in self.heat_accumulator and self.heat_accumulator['volume']:
+        if (
+                'volume' in self.heat_accumulator and
+                self.heat_accumulator['volume']
+        ):
             return self.heat_accumulator['volume']
-        if 'material' in self.heat_accumulator and self.heat_accumulator['material']:
+        if (
+                'material' in self.heat_accumulator and
+                self.heat_accumulator['material']
+        ):
             return self.get_prop(
                 self.heat_accumulator['material'],
                 'density'
@@ -288,7 +297,8 @@ class Building:
 
     @property
     def area_mass_walls_inside(self) -> float:
-        """Calculates area of the walls around the heat accumulator inside of the house"""
+        """Calculates area of the walls around the heat accumulator
+        inside of the house."""
         if not self.heat_accumulator:
             return 0
         p = self.get_perimeter_floor('inside')
@@ -297,7 +307,8 @@ class Building:
 
     @property
     def area_mass_walls_outside(self) -> float:
-        """Calculates area of the walls around the heat accumulator outside of the house"""
+        """Calculates area of the walls around the heat accumulator outside of
+         the house."""
         p = self.get_perimeter_floor('outside')
         h = self.heat_accumulator_volume / self.floor_area_inside
         th = self.wall_thickness
@@ -339,12 +350,12 @@ class Building:
             return self.mesh_inside.section(
                 plane_origin=self.mesh_inside.bounds[0],
                 plane_normal=[0, 0, 1]).length
-        
+
     def get_efficient_angle(self, reflect_material: dict = None) -> float:
         """ Get angle for material. """
         ang = reflect_material[self.material]
         return ang
-        
+
     def calc_reflect_power(
             self,
             power: float,
@@ -357,9 +368,9 @@ class Building:
         Returns: float of power of the reflection of material.
 
         """
-        #    dict_kr_mat = {'polycarbonat':1.585, 
+        #    dict_kr_mat = {'polycarbonat':1.585,
         #                  'glass':1.4}
-        #    dict_ki_mat = {'polycarbonat':0.82, 
+        #    dict_ki_mat = {'polycarbonat':0.82,
         #                    'glass':0.86}
         table_kr_mat = {'polycarbonat': {
                                         40: 0.04,
@@ -423,7 +434,9 @@ class Building:
                 face_normal = triangles.normals((tri, ))[0][0]
                 face_tilt = geometry.vector_angle((face_normal, (0, 0, 1)))
                 face_normal_projection = self.projection_on_flat(face_normal)
-                face_azimuth = geometry.vector_angle((face_normal_projection, (0, 1, 0)))
+                face_azimuth = geometry.vector_angle(
+                    (face_normal_projection, (0, 1, 0))
+                )
                 sun_power_face = self.get_pv_power_face(
                     face_tilt,
                     face_azimuth,
@@ -438,10 +451,14 @@ class Building:
                 index += 1
         self.power_data = pd.DataFrame(dict_temp_data)
         fields = list(self.power_data)
-        self.power_data['sum_solar_power'] = self.power_data[fields].sum(axis=1)
-        self.power_data['maximum_solar_power'] = self.power_data[fields].max(axis=1)
-        self.power_data['ind_face'] = self.power_data[fields].idxmax(axis=1)
-        self.power_data_by_days = self.power_data['sum_solar_power'].resample('1D').mean()
+        self.power_data['sum_solar_power'] = self.power_data[fields]\
+            .sum(axis=1)
+        self.power_data['maximum_solar_power'] = self.power_data[fields]\
+            .max(axis=1)
+        self.power_data['ind_face'] = self.power_data[fields]\
+            .idxmax(axis=1)
+        self.power_data_by_days = self.power_data['sum_solar_power']\
+            .resample('1D').mean()
         return
 
     def get_prop(self, material: str, prop: str) -> float:

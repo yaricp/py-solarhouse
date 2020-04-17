@@ -19,7 +19,7 @@ class Calculation:
     As result you can get html page with graphics.
     Also you can export data in file CSV or JSON.
     """
-    
+
     def __init__(
                 self,
                 tz: str,
@@ -53,7 +53,11 @@ class Calculation:
             **kwargs
         )
 
-    def __get_weather(self, start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame:
+    def __get_weather(
+            self,
+            start: pd.Timestamp,
+            end: pd.Timestamp
+    ) -> pd.DataFrame:
         """
         Get weather data for period.
         :param start: - pd.Timestamp, begin of period
@@ -68,7 +72,12 @@ class Calculation:
             start,
             end)
 
-    def __get_clear_sky(self, start: pd.Timestamp, end: pd.Timestamp, model: str = 'ineichen') -> pd.DataFrame:
+    def __get_clear_sky(
+            self,
+            start: pd.Timestamp,
+            end: pd.Timestamp,
+            model: str = 'ineichen'
+    ) -> pd.DataFrame:
         """
         Get sun data of irradiation of sun without weather.
         :param start: - pd.Timestamp, begin of period
@@ -90,10 +99,21 @@ class Calculation:
             with_weather: bool = True
             ) -> None:
         """ proxy method for prepare period and calculations. """
-        start, end = prepare_period(tz=self.tz, date=date, month=month, year=year, period=period)
+        start, end = prepare_period(
+            tz=self.tz,
+            date=date,
+            month=month,
+            year=year,
+            period=period
+        )
         return self.start_calculation(start, end, with_weather=with_weather)
 
-    def start_calculation(self, start: pd.Timestamp, end: pd.Timestamp, with_weather: bool = True) -> None:
+    def start_calculation(
+            self,
+            start: pd.Timestamp,
+            end: pd.Timestamp,
+            with_weather: bool = True
+    ) -> None:
         """ Start calculations. """
         get_weather = self.__get_clear_sky
         if with_weather:

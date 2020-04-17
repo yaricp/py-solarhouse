@@ -6,10 +6,10 @@ import pandas as pd
 
 
 def as_file(
-        pd_data: pd.DataFrame,
-        type_file: str = 'csv',
-        path: str = 'output'
-    ) -> None:
+            pd_data: pd.DataFrame,
+            type_file: str = 'csv',
+            path: str = 'output'
+        ) -> None:
     """ Export results to file. """
 
     file_path = os.path.join(path, 'data.%s' % type_file)
