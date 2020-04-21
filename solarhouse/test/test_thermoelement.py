@@ -1,4 +1,4 @@
-from thermoelement import Element
+from thermal_element import ThermalElement
 
 
 def test_cube_water():
@@ -6,7 +6,7 @@ def test_cube_water():
     Test cube water as a thermal point.
     Result of test calculated manually.
     """
-    e = Element(
+    e = ThermalElement(
             name='cube_water',
             temp0=0,
             density=997,
@@ -25,7 +25,7 @@ def test_wall_birch():
     All result for test calculated manually.
     In this test made two circle of calculation of all 20 point of wall.
     """
-    e = Element(
+    e = ThermalElement(
             name='birch_wall',
             temp0=20.0,
             density=700.0,
@@ -54,7 +54,7 @@ def test_wall_birch():
 
 def test_thin_layer():
     """Example element which implementing  thin layer between two areas."""
-    e = Element(
+    e = ThermalElement(
             name='glass',
             temp0=20.0,
             area_inside=1.0,

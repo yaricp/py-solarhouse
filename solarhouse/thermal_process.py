@@ -1,7 +1,7 @@
 import pandas as pd
 
-from thermoelement import Element
-from thermomodel import Model
+from thermal_element import ThermalElement
+from thermal_model import ThermalModel
 from building import Building
 
 
@@ -70,7 +70,7 @@ class ThermalProcess:
                     self.heat_accumulator_density
                 )
 
-        mass = Element(
+        mass = ThermalElement(
             name='mass',
             temp0=self.t_start,
             density=self.heat_accumulator_density,
@@ -79,7 +79,7 @@ class ThermalProcess:
             area_inside=self.building.floor_area_inside,
             input_alpha=self.alpha_room
         )
-        room = Element(
+        room = ThermalElement(
             name='room',
             temp0=self.t_start,
             density=1.27,
@@ -88,13 +88,13 @@ class ThermalProcess:
             area_inside=self.building.floor_area_inside,
             input_alpha=self.alpha_room
         )
-        windows = Element(
+        windows = ThermalElement(
             name='windows',
             temp0=-5,
             area_inside=self.building.windows['area'],
             input_alpha=1/self.building.windows['therm_r']
         )
-        floor = Element(
+        floor = ThermalElement(
             name='floor',
             temp0=18,
             area_inside=self.building.floor_area_inside,
@@ -112,7 +112,7 @@ class ThermalProcess:
                 'heat_capacity'),
             input_alpha=self.alpha_room
         )
-        walls = Element(
+        walls = ThermalElement(
             name='walls',
             temp0=self.t_start,
             area_inside=self.building.walls_area_inside,
@@ -131,7 +131,7 @@ class ThermalProcess:
             input_alpha=self.alpha_room
         )
 
-        walls_mass = Element(
+        walls_mass = ThermalElement(
             name='walls_mass',
             temp0=self.t_start,
             dx=self.dx,
@@ -149,13 +149,13 @@ class ThermalProcess:
                 'heat_capacity'),
             input_alpha=self.alpha_room
         )
-        outside = Element(
+        outside = ThermalElement(
             name='outside',
             temp0=-5,
             area_inside=self.building.walls_area_outside,
             input_alpha=self.alpha_out
         )
-        fl_outside = Element(
+        fl_outside = ThermalElement(
             name='fl_out',
             temp0=self.building.floor['t_out'],
             area_inside=self.building.floor_area_outside,
@@ -166,7 +166,7 @@ class ThermalProcess:
         walls_mass.branches_loss = [outside]
         floor.branches_loss = [fl_outside]
 
-        self.model = Model(name=variant)
+        self.model = ThermalModel(name=variant)
         self.model.elements = {
             'mass': mass,
             'room': room,

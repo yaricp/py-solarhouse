@@ -2,14 +2,14 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from solarhouse.thermoelement import Element
-from solarhouse.thermomodel import Model
+from solarhouse.thermal_element import ThermalElement
+from solarhouse.thermal_model import ThermalModel
 
 
 alpha_out = 1/0.04
 alpha_windows = 1 / 0.52
 
-mass = Element(
+mass = ThermalElement(
     name='mass',
     temp0=20,
     density=997,
@@ -17,7 +17,7 @@ mass = Element(
     volume=0.001
 )
 
-outside = Element(
+outside = ThermalElement(
     name='outside',
     temp0=18,
     area_inside=0.06,
@@ -26,7 +26,7 @@ outside = Element(
 
 mass.branches_loss =[outside]
 
-mass_model = Model(name='power_to_mass')
+mass_model = ThermalModel(name='power_to_mass')
 mass_model.elements = {
     'mass': mass,
     'outside': outside

@@ -1,17 +1,17 @@
 import numpy as np
 
 
-class Element:
+class ThermalElement:
     """
     Implements thermal element for thermal calculations.
-    It represents as a point with heat capacity.
-    Change of temperature of this point depend of summ of input and
-    output energy and heat capacity. Output energy are negative.
-    The several elements can be connected to the chain of elements.
-    Output energy depends of temperature current element and temperature
-    next element in chain and thermal resistance between each other.
-    The element can have several elements of output enegry.
-    Non first elements must have area of input face (square meters)
+    Represents a point with heat capacity.
+    Change of temperature of this point depend on sum of input and
+    output energy and heat capacity. Output energy is negative.
+    Several elements can be connected into a chain of elements.
+    Output energy depends on temperature of current element, temperature of
+    next element in chain, and thermal resistance between each other.
+    An element can have several elements of output enegry.
+    Second and further elements must have area of input face (square meters)
     and input coefficient of transcalency on input face.
 
     Also element may be represented like a wall with a variable area
@@ -20,7 +20,7 @@ class Element:
     All calculations makes for dt.
     Example calculate temperature of mass of water volume 1 cubic
      meter in 1 hour and 1 kW power:
-    >>> e = Element(\
+    >>> e = ThermalElement(\
             name='cube_water',\
             temp0=0,\
             density=997,\
@@ -29,14 +29,14 @@ class Element:
             )
     >>> e.n
     1
-    >>> e.start_calc(1000,3600)
+    >>> e.start_calc(q_enter=1000, dt=3600)
     >>> round(e.temp, 3)
     0.864
     >>>
-    Example calculate of wall from birch with dx = 0.01 meter and
-    1 kW power coming to inside area of element.
+    Example: calculate temperature of inside face of wall of birch
+    with dx = 0.01 m and external power of 1 kW.
     Result of test calculated manually.
-    >>> e = Element(\
+    >>> e = ThermalElement(\
             name='birch_wall',\
             temp0=20.0,\
             density=700.0,\
@@ -56,21 +56,21 @@ class Element:
     0.5
     >>> e.get_loss_dx(0)
     0.0
-    >>> e.start_calc(1000, 1)
+    >>> e.start_calc(q_enter=1000, dt=1)
     >>> round(e.dTx_list[0], 3)
     20.114
     >>> round(e.dTx_list[1], 3)
     20.0
     >>> round(e.get_loss_dx(0),3)
     1.723
-    >>> e.start_calc(1000, 1)
+    >>> e.start_calc(q_enter=1000, dt=1)
     >>> round(e.dTx_list[0], 3)
     20.228
     >>> round(e.dTx_list[1], 4)
     20.0002
     >>>
     Example element which implementing  thin layer between two areas
-    >>> e = Element(\
+    >>> e = ThermalElement(\
             name='glass',\
             temp0=20.0,\
             area_inside=1.0,\

@@ -1,5 +1,5 @@
 
-class Model:
+class ThermalModel:
     """
     Class implements process of calculation of some model
     of thermal object which contains several thermal elements.

@@ -4,16 +4,18 @@ import datetime
 import pandas as pd
 import numpy as np
 
-from trimesh import triangles
-
 from pvlib.pvsystem import PVSystem
 from pvlib.location import Location
 from pvlib.modelchain import ModelChain
 from pvlib.temperature import TEMPERATURE_MODEL_PARAMETERS
 
-from trimesh import geometry, load
+from trimesh import (
+        geometry,
+        load,
+        triangles
+    )
 
-from settings import *
+import settings
 
 temp_model_pars = TEMPERATURE_MODEL_PARAMETERS['sapm']['open_rack_glass_glass']
 
@@ -423,7 +425,7 @@ class Building:
         face_indexes = []
         count_faces = 0
 
-        if count_faces >= COUNT_FACES_FOR_PARALLEL_CALC:
+        if count_faces >= settings.COUNT_FACES_FOR_PARALLEL_CALC:
             # TODO Start parallels calc in actors model
             pass
         else:

@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from solarhouse.thermoelement import Element
-from solarhouse.thermomodel import Model
+from solarhouse.thermal_element import ThermalElement
+from solarhouse.thermal_model import ThermalModel
 
 power = 1000
 seconds = 60 * 60
@@ -15,7 +15,7 @@ alpha_room = 1/0.13
 alpha_out = 1/0.04
 alpha_windows = 1 / 0.52
 
-mass = Element(
+mass = ThermalElement(
     name='mass',
     temp0=20,
     density=997,
@@ -23,7 +23,7 @@ mass = Element(
     volume=0.5
 )
 
-room = Element(
+room = ThermalElement(
     name='room',
     temp0=20,
     density=1.27,
@@ -32,13 +32,13 @@ room = Element(
     area_inside=area_floor,
     input_alpha=alpha_room
 )
-windows = Element(
+windows = ThermalElement(
     name='windows',
     temp0=-5,
     area_inside=10,
     input_alpha=alpha_windows
 )
-floor = Element(
+floor = ThermalElement(
     name='floor',
     temp0=18,
     area_inside=area_floor,
@@ -51,7 +51,7 @@ floor = Element(
     input_alpha=alpha_room
 )
 
-walls = Element(
+walls = ThermalElement(
     name='walls',
     temp0=18,
     area_inside=S-50,
@@ -63,13 +63,13 @@ walls = Element(
     heat_capacity=880,
     input_alpha=alpha_room
 )
-outside = Element(
+outside = ThermalElement(
     name='outside',
     temp0=-5,
     area_inside=160,
     input_alpha=alpha_out
 )
-fl_outside = Element(
+fl_outside = ThermalElement(
     name='fl_out',
     temp0=5,
     area_inside=area_floor+20,
@@ -81,7 +81,7 @@ room.branches_loss = [windows, walls]
 walls.branches_loss = [outside]
 floor.branches_loss = [fl_outside]
 
-mass_model = Model(name='power_to_mass')
+mass_model = ThermalModel(name='power_to_mass')
 mass_model.elements = {
     'mass': mass,
     'room': room,
