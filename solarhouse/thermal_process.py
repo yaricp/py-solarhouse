@@ -7,13 +7,14 @@ from building import Building
 
 class ThermalProcess:
     """
-    Class implements all calculations of thermal processes in house.
-    There are three main models of house:
-    1. All solar power (with efficient for water solar collector) comes
-    to inside the massive in the house.
-    2. All solar power (with efficient for air solar collector) comes
-    to inside the volume in the house.
-    3. All solar power comes inside the walls through glass dome.
+    Class implements all calculations of thermal processes in a house.
+    There are three main models of a house:
+    1. All solar power comes into massive body (water tank, concrete
+       plate, etc.) in the house with respect to efficient coefficient
+       of water solar collector.
+    2. All solar power heats up air inside the house with respect
+       efficient coefficient of air solar collector.
+    3. All solar power heats up walls through a glass dome.
     """
 
     def __init__(

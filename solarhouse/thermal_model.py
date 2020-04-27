@@ -47,6 +47,6 @@ class ThermalModel:
         for el in self.outside_elements:
             el.temp = t_out
         for i in range(count):
-            self.start_element.start_calc(power, dt)
+            self.start_element.compute(power, dt)
         # TODO  make return data elements by dx for plots
         return

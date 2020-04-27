@@ -1,4 +1,3 @@
-
 import math
 import datetime
 import pandas as pd
@@ -19,25 +18,23 @@ import settings
 
 temp_model_pars = TEMPERATURE_MODEL_PARAMETERS['sapm']['open_rack_glass_glass']
 
-properties_materials = {'cob': {
-                            'transcalency': 0.04,
-                            'heat_capacity': 450.0,
-                            'density': 450.0
-                        },
-                        'water': {
-                            'transcalency': 0.599,
-                            'heat_capacity': 4182,
-                            'density': 998.29
-                        },
-                        'birch': {
-                            'transcalency': 0.15,
-                            'heat_capacity': 1250.0,
-                            'density': 700.0,
-                        },
-                        'brick': {
-
-                        }
-                        }
+properties_materials = {
+    'adobe': {
+        'transcalency': 0.04,
+        'heat_capacity': 450.0,
+        'density': 450.0
+    },
+    'water': {
+        'transcalency': 0.599,
+        'heat_capacity': 4182,
+        'density': 998.29
+    },
+    'birch': {
+        'transcalency': 0.15,
+        'heat_capacity': 1250.0,
+        'density': 700.0,
+    }
+}
 
 
 class Building:
@@ -113,14 +110,13 @@ class Building:
     >>> date = datetime.datetime(day=22, month=6, year=2020)
 
     """
-    thermal_elements = ['mass', 'room', 'wall', 'walls_mass', 'floor',
-                        'windows', 'outside', 'fl_out']
+    thermal_elements = ['mass', 'room', 'wall', 'walls_mass', 'floor', 'windows', 'outside', 'fl_out']
 
     def __init__(
                 self,
                 mesh_file: str,
                 geo: dict,
-                wall_material: str = 'cob',
+                wall_material: str = 'adobe',
                 wall_thickness: float = 0.3,
                 start_temp_in: float = 20,
                 power_heat_inside: float = 0,
@@ -136,9 +132,7 @@ class Building:
         self.mesh = load(mesh_file)
         self.__mesh_inside = None
         if not self.mesh.is_watertight:
-            raise Exception(
-                'Mesh is not watertight',
-                'Error')
+            raise Exception('Mesh is not watertight', 'Error')
         self.geo = geo
         self.material = wall_material
         self.wall_thickness = wall_thickness
@@ -160,19 +154,19 @@ class Building:
             'therm_r': 0.0,
             'losses': 0.0,
             'area': 0.0,
-            })
+        })
         self.floor = kwargs.get('floor', {
             'material': self.material,
             'therm_r': 0,
             'area': 0,
-            'layers': []
-            })
+            'layers': [],
+        })
         self.ceiling = kwargs.get('ceiling', {
             'material': self.material,
             'therm_r': 0,
             'area': 0,
-            'layers': []
-            })
+            'layers': [],
+        })
         self.extra_losses = kwargs.get('extra_losses', {})
 
         self.__centring()
@@ -184,7 +178,8 @@ class Building:
         self.power_data_by_days = None
         self.location = Location(
             latitude=geo['latitude'],
-            longitude=geo['longitude'])
+            longitude=geo['longitude'],
+        )
         self.pv = PVSystem(
             surface_tilt=45,
             surface_azimuth=180,

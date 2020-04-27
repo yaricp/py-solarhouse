@@ -12,7 +12,8 @@ pvlib
 netCDF4
 siphon
 tables
-cftime==1.0.3.4
+cftime
 networkx
 pytest
 pytest-pep8
+#==1.0.3.4

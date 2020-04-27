@@ -13,8 +13,8 @@ def test_cube_water():
             heat_capacity=4180,
             volume=1
             )
-    assert e.n == 1
-    e.start_calc(1000, 3600)
+    assert e.count_layers == 1
+    e.compute(1000, 3600)
     assert round(e.temp, 3) == 0.864
 
 
@@ -36,18 +36,18 @@ def test_wall_birch():
             area_inside=1.0,
             area_outside=1.1
             )
-    assert e.n == 20
+    assert e.count_layers == 20
     assert e.dTx_list == [
         20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0,
         20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0
     ]
     assert round(e.k_area, 3) == 0.5
     assert e.get_loss_dx(0) == 0.0
-    e.start_calc(1000, 1)
+    e.compute(1000, 1)
     assert round(e.dTx_list[0], 3) == 20.114
     assert round(e.dTx_list[1], 3) == 20.0
     assert round(e.get_loss_dx(0), 3) == 1.723
-    e.start_calc(1000, 1)
+    e.compute(1000, 1)
     assert round(e.dTx_list[0], 3) == 20.228
     assert round(e.dTx_list[1], 4) == 20.0002
 

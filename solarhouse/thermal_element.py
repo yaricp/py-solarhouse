@@ -3,10 +3,10 @@ import numpy as np
 
 class ThermalElement:
     """
-    Implements thermal element for thermal calculations.
+    Implements thermal element for thermal computation.
     Represents a point with heat capacity.
-    Change of temperature of this point depend on sum of input and
-    output energy and heat capacity. Output energy is negative.
+    Change of temperature of this point depends on sum of input and
+    output energy and heat capacity (output energy is negative).
     Several elements can be connected into a chain of elements.
     Output energy depends on temperature of current element, temperature of
     next element in chain, and thermal resistance between each other.
@@ -14,12 +14,12 @@ class ThermalElement:
     Second and further elements must have area of input face (square meters)
     and input coefficient of transcalency on input face.
 
-    Also element may be represented like a wall with a variable area
-    and with variable thermal resistance on each dx.
-    Calculation realized on one direction dx (in meters).
-    All calculations makes for dt.
-    Example calculate temperature of mass of water volume 1 cubic
-     meter in 1 hour and 1 kW power:
+    Also element may be represented as a wall with a variable area
+    and with variable thermal resistance on each increment of thickness, dx.
+    Computation is implemented in single dimension, dx (meters).
+    All computations are performed for increments of time, dt.
+    Example: compute temperature of 1 cubic meter of water in 1 hour with
+             1 kW of power applied:
     >>> e = ThermalElement(\
             name='cube_water',\
             temp0=0,\
@@ -27,9 +27,9 @@ class ThermalElement:
             heat_capacity=4180,\
             volume=1\
             )
-    >>> e.n
+    >>> e.count_layers
     1
-    >>> e.start_calc(q_enter=1000, dt=3600)
+    >>> e.compute(q_enter=1000, dt=3600)
     >>> round(e.temp, 3)
     0.864
     >>>
@@ -47,7 +47,7 @@ class ThermalElement:
             area_inside=1.0,\
             area_outside=1.1\
             )
-    >>> e.n
+    >>> e.count_layers
     20
     >>> e.dTx_list
     [20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0,\
@@ -56,14 +56,14 @@ class ThermalElement:
     0.5
     >>> e.get_loss_dx(0)
     0.0
-    >>> e.start_calc(q_enter=1000, dt=1)
+    >>> e.compute(q_enter=1000, dt=1)
     >>> round(e.dTx_list[0], 3)
     20.114
     >>> round(e.dTx_list[1], 3)
     20.0
     >>> round(e.get_loss_dx(0),3)
     1.723
-    >>> e.start_calc(q_enter=1000, dt=1)
+    >>> e.compute(q_enter=1000, dt=1)
     >>> round(e.dTx_list[0], 3)
     20.228
     >>> round(e.dTx_list[1], 4)
@@ -105,11 +105,11 @@ class ThermalElement:
 
         self.branches_loss = []
         self.counter = 0
-        self.n = 1
+        self.count_layers = 1
         self.dTx_list = [self.temp]
         if self.thickness and self.dx:
-            self.n = int(self.thickness/self.dx)
-            self.dTx_list = list(np.ones(self.n) * self.temp)
+            self.count_layers = int(self.thickness/self.dx)
+            self.dTx_list = list(np.ones(self.count_layers) * self.temp)
         self.k_area = None
         if (self.area_inside and
                 self.area_outside and
@@ -160,7 +160,7 @@ class ThermalElement:
             Float value of heat capacity
         """
         a = self.density * self.heat_capacity
-        if self.n == 1:
+        if self.count_layers == 1:
             return self.volume * a
         return self.dx * self.__get_area_dx(iterator) * a
 
@@ -219,7 +219,7 @@ class ThermalElement:
             self.dTx_list[iterator] = self.dTx_list[iterator] + dT
         return
 
-    def start_calc(self, q_enter: float, dt: float) -> None:
+    def compute(self, q_enter: float, dt: float) -> None:
         """
         Start of calculate temperature of element if
         it represent as a point or calculate of all
@@ -231,12 +231,12 @@ class ThermalElement:
         """
         if not self.heat_capacity or not self.density:
             return
-        for i in range(0, self.n):
+        for i in range(0, self.count_layers):
             q_loss = 0
-            if (i + 1) == self.n:
+            if (i + 1) == self.count_layers:
                 for branch in self.branches_loss:
                     q = branch.calc_loss_input_q(self.dTx_list[i])
-                    branch.start_calc(q, dt)
+                    branch.compute(q, dt)
                     q_loss += q
             else:
                 q_loss = self.get_loss_dx(i)
