@@ -14,8 +14,8 @@ from helpers import prepare_period
 
 class Calculation:
     """
-    Class implements methods for calculate of the solar power
-    what you can take on faces of the building.
+    Class implements methods for computations of amount of solar power
+    that one can obtain from faces of a building.
     As result you can get html page with graphics.
     Also you can export data in file CSV or JSON.
     """
@@ -23,7 +23,7 @@ class Calculation:
     def __init__(
                 self,
                 tz: str,
-                path_file_object: str,
+                building_mesh_file_path: str,
                 geo: dict,
                 wall_material: str,
                 wall_thickness: float,
@@ -38,12 +38,9 @@ class Calculation:
         self.geo = geo
         self.tz = pytz.timezone(tz)
         self.pd_data_for_export = None
-        self.headers = {
-            'power': ['day', 'sum_watt_hour'],
-            'temperature': ['day', 'temp in', 'temp out']
-        }
+        # TODO: remove responsibility of creating a building and accept the building as a parameter
         self.building = Building(
-            path_file_object,
+            building_mesh_file_path,
             geo,
             wall_material,
             wall_thickness,
@@ -53,7 +50,46 @@ class Calculation:
             **kwargs
         )
 
-    def __get_weather(
+    def compute(
+            self,
+            date: datetime.datetime = None,
+            month: datetime.datetime = None,
+            year: datetime.datetime = None,
+            period: tuple = None,
+            with_weather: bool = True
+            ) -> None:
+        """ Use this method for actual computation. """
+        start, end = prepare_period(
+            tz=self.tz,
+            date=date,
+            month=month,
+            year=year,
+            period=period
+        )
+        return self._start_calculation(start, end, with_weather=with_weather)
+
+    def _start_calculation(
+            self,
+            start: pd.Timestamp,
+            end: pd.Timestamp,
+            with_weather: bool = True
+    ) -> None:
+        """ Start calculations. """
+        get_weather = self._get_clear_sky
+        if with_weather:
+            get_weather = self._get_weather
+        self.building.weather_data = get_weather(start, end)
+        self.building.calc_sun_power_on_faces()
+        thermal_process = ThermalProcess(
+            t_start=20,
+            building=self.building,
+            variant='heat_to_mass',
+            for_plots=['mass', 'room']
+        )
+        self.pd_data_for_export = thermal_process.run_process()
+        return self.pd_data_for_export
+
+    def _get_weather(
             self,
             start: pd.Timestamp,
             end: pd.Timestamp
@@ -72,7 +108,7 @@ class Calculation:
             start,
             end)
 
-    def __get_clear_sky(
+    def _get_clear_sky(
             self,
             start: pd.Timestamp,
             end: pd.Timestamp,
@@ -89,45 +125,6 @@ class Calculation:
         """
         period = pd.date_range(start=start, end=end, freq='1h', tz=self.tz)
         return self.building.location.get_clearsky(period, model=model)
-
-    def start(
-            self,
-            date: datetime.datetime = None,
-            month: datetime.datetime = None,
-            year: datetime.datetime = None,
-            period: tuple = None,
-            with_weather: bool = True
-            ) -> None:
-        """ proxy method for prepare period and calculations. """
-        start, end = prepare_period(
-            tz=self.tz,
-            date=date,
-            month=month,
-            year=year,
-            period=period
-        )
-        return self.start_calculation(start, end, with_weather=with_weather)
-
-    def start_calculation(
-            self,
-            start: pd.Timestamp,
-            end: pd.Timestamp,
-            with_weather: bool = True
-    ) -> None:
-        """ Start calculations. """
-        get_weather = self.__get_clear_sky
-        if with_weather:
-            get_weather = self.__get_weather
-        self.building.weather_data = get_weather(start, end)
-        self.building.calc_sun_power_on_faces()
-        thermal_process = ThermalProcess(
-            t_start=20,
-            building=self.building,
-            variant='heat_to_mass',
-            for_plots=['mass', 'room']
-        )
-        self.pd_data_for_export = thermal_process.run_process()
-        return self.pd_data_for_export
 
 
 if __name__ == "__main__":

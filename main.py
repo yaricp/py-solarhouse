@@ -24,9 +24,9 @@ def main():
     calc_id = calc.id
     if not os.path.exists(os.path.join(PATH_OUTPUT, calc_id)):
         os.mkdir(os.path.join(PATH_OUTPUT, calc_id))
-    dataf = calc.start(date=22, month=12, year=2019, with_weather=False)
-    ex.as_file(dataf, 'csv', os.path.join(PATH_OUTPUT, calc_id))
-    ex.as_html(dataf, os.path.join(PATH_OUTPUT, calc_id))
+    data_frame = calc.compute(date=22, month=12, year=2019, with_weather=False)
+    ex.as_file(data_frame, 'csv', os.path.join(PATH_OUTPUT, calc_id))
+    ex.as_html(data_frame, os.path.join(PATH_OUTPUT, calc_id))
    
     with open(os.path.join(PATH_OUTPUT, calc_id, 'data.csv'), 'r') as file:
         print(file.read())
