@@ -23,7 +23,7 @@ class Calculation:
     def __init__(
                 self,
                 tz: str,
-                path_file_object: str,
+                building_mesh_file_path: str,
                 geo: dict,
                 wall_material: str,
                 wall_thickness: float,
@@ -38,12 +38,8 @@ class Calculation:
         self.geo = geo
         self.tz = pytz.timezone(tz)
         self.pd_data_for_export = None
-        self.headers = {
-            'power': ['day', 'sum_watt_hour'],
-            'temperature': ['day', 'temp in', 'temp out']
-        }
         self.building = Building(
-            path_file_object,
+            building_mesh_file_path,
             geo,
             wall_material,
             wall_thickness,
@@ -52,6 +48,24 @@ class Calculation:
             efficiency_collector,
             **kwargs
         )
+
+    def compute(
+            self,
+            date: datetime.datetime = None,
+            month: datetime.datetime = None,
+            year: datetime.datetime = None,
+            period: tuple = None,
+            with_weather: bool = True
+            ) -> None:
+        """ proxy method for prepare period and calculations. """
+        start, end = prepare_period(
+            tz=self.tz,
+            date=date,
+            month=month,
+            year=year,
+            period=period
+        )
+        return self.start_calculation(start, end, with_weather=with_weather)
 
     def __get_weather(
             self,
@@ -89,24 +103,6 @@ class Calculation:
         """
         period = pd.date_range(start=start, end=end, freq='1h', tz=self.tz)
         return self.building.location.get_clearsky(period, model=model)
-
-    def start(
-            self,
-            date: datetime.datetime = None,
-            month: datetime.datetime = None,
-            year: datetime.datetime = None,
-            period: tuple = None,
-            with_weather: bool = True
-            ) -> None:
-        """ proxy method for prepare period and calculations. """
-        start, end = prepare_period(
-            tz=self.tz,
-            date=date,
-            month=month,
-            year=year,
-            period=period
-        )
-        return self.start_calculation(start, end, with_weather=with_weather)
 
     def start_calculation(
             self,
