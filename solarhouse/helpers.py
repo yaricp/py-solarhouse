@@ -4,12 +4,12 @@ import pandas as pd
 
 
 def prepare_period(
-            tz,
-            date: datetime.datetime = None,
-            month: datetime.datetime = None,
-            year: datetime.datetime = None,
-            period: tuple = None,
-        ) -> tuple:
+    tz,
+    date: datetime.datetime = None,
+    month: datetime.datetime = None,
+    year: datetime.datetime = None,
+    period: tuple = None,
+) -> tuple:
     """
     Prepare period for retrive data of wheather and calculate sun power.
     :param tz:  - time zone of geoposition of building

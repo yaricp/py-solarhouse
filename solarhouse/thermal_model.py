@@ -1,4 +1,3 @@
-
 class ThermalModel:
     """
     Class implements process of calculation of some model
@@ -13,14 +12,14 @@ class ThermalModel:
         :param kwargs: some parameters
         """
         self.name = name
-        self.elements = kwargs.get('elements', {})
-        self.initial_conditions = kwargs.get('initial_conditions', {})
-        self.start_element = kwargs.get('start_element', None)
-        self.outside_elements = kwargs.get('outside', [])
+        self.elements = kwargs.get("elements", {})
+        self.initial_conditions = kwargs.get("initial_conditions", {})
+        self.start_element = kwargs.get("start_element", None)
+        self.outside_elements = kwargs.get("outside", [])
 
     def show_schema(self):
         """ Shows schema of chain. """
-        text = '%s ->' % self.start_element.name
+        text = "%s ->" % self.start_element.name
         print(text)
         return
 
@@ -29,12 +28,7 @@ class ThermalModel:
         for el, val in self.initial_conditions.items():
             self.elements[el].init_conditions(val)
 
-    def start(
-            self,
-            count: int,
-            dt: int,
-            power: float,
-            t_out: float) -> dict:
+    def start(self, count: int, dt: int, power: float, t_out: float) -> dict:
         """
 
         :param count: count of calculation

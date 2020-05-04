@@ -1,5 +1,4 @@
 import math
-import datetime
 import pandas as pd
 import numpy as np
 
@@ -8,32 +7,16 @@ from pvlib.location import Location
 from pvlib.modelchain import ModelChain
 from pvlib.temperature import TEMPERATURE_MODEL_PARAMETERS
 
-from trimesh import (
-        geometry,
-        load,
-        triangles
-    )
+from trimesh import geometry, load, triangles
 
 import settings
 
-temp_model_pars = TEMPERATURE_MODEL_PARAMETERS['sapm']['open_rack_glass_glass']
+temp_model_pars = TEMPERATURE_MODEL_PARAMETERS["sapm"]["open_rack_glass_glass"]
 
 properties_materials = {
-    'adobe': {
-        'transcalency': 0.04,
-        'heat_capacity': 450.0,
-        'density': 450.0
-    },
-    'water': {
-        'transcalency': 0.599,
-        'heat_capacity': 4182,
-        'density': 998.29
-    },
-    'birch': {
-        'transcalency': 0.15,
-        'heat_capacity': 1250.0,
-        'density': 700.0,
-    }
+    "adobe": {"transcalency": 0.04, "heat_capacity": 450.0, "density": 450.0},
+    "water": {"transcalency": 0.599, "heat_capacity": 4182, "density": 998.29},
+    "birch": {"transcalency": 0.15, "heat_capacity": 1250.0, "density": 700.0},
 }
 
 
@@ -111,29 +94,36 @@ class Building:
     >>> date = datetime.datetime(day=22, month=6, year=2020)
 
     """
-    thermal_elements = ['mass', 'room', 'wall', 'walls_mass', 'floor', 'windows', 'outside', 'fl_out']
+
+    thermal_elements = [
+        "mass",
+        "room",
+        "wall",
+        "walls_mass",
+        "floor",
+        "windows",
+        "outside",
+        "fl_out",
+    ]
 
     def __init__(
-                self,
-                mesh_file: str,
-                geo: dict,
-                wall_material: str = 'adobe',
-                wall_thickness: float = 0.3,
-                start_temp_in: float = 20,
-                power_heat_inside: float = 0,
-                efficiency: float = 60,
-                cover_material: str = None,
-                heat_accumulator: dict = {
-                    'volume': 0.02,
-                    'material': 'water'
-                },
-                **kwargs
-                ) -> None:
+        self,
+        mesh_file: str,
+        geo: dict,
+        wall_material: str = "adobe",
+        wall_thickness: float = 0.3,
+        start_temp_in: float = 20,
+        power_heat_inside: float = 0,
+        efficiency: float = 60,
+        cover_material: str = None,
+        heat_accumulator: dict = {"volume": 0.02, "material": "water"},
+        **kwargs
+    ) -> None:
         """ Initialize object of class Building. """
         self.mesh = load(mesh_file)
         self.__mesh_inside = None
         if not self.mesh.is_watertight:
-            raise Exception('Mesh is not watertight', 'Error')
+            raise Exception("Mesh is not watertight", "Error")
         self.geo = geo
         self.material = wall_material
         self.wall_thickness = wall_thickness
@@ -143,32 +133,24 @@ class Building:
         self.efficiency = efficiency
         self.cover_material = cover_material
         self.dict_properties_materials = properties_materials
-        self.wall_layers = kwargs.get('wall_layers', None)
-        self.dict_power_inside = kwargs.get('dict_power_inside', None)
+        self.wall_layers = kwargs.get("wall_layers", None)
+        self.dict_power_inside = kwargs.get("dict_power_inside", None)
         self.dict_properties_materials = kwargs.get(
-            'properties_materials',
-            properties_materials
+            "properties_materials", properties_materials
         )
-        self.ventilation_losses = kwargs.get('ventilation_losses', 0)
+        self.ventilation_losses = kwargs.get("ventilation_losses", 0)
         self.heat_accumulator = heat_accumulator
-        self.windows = kwargs.get('windows', {
-            'therm_r': 0.0,
-            'losses': 0.0,
-            'area': 0.0,
-        })
-        self.floor = kwargs.get('floor', {
-            'material': self.material,
-            'therm_r': 0,
-            'area': 0,
-            'layers': [],
-        })
-        self.ceiling = kwargs.get('ceiling', {
-            'material': self.material,
-            'therm_r': 0,
-            'area': 0,
-            'layers': [],
-        })
-        self.extra_losses = kwargs.get('extra_losses', {})
+        self.windows = kwargs.get(
+            "windows", {"therm_r": 0.0, "losses": 0.0, "area": 0.0}
+        )
+        self.floor = kwargs.get(
+            "floor", {"material": self.material, "therm_r": 0, "area": 0, "layers": []}
+        )
+        self.ceiling = kwargs.get(
+            "ceiling",
+            {"material": self.material, "therm_r": 0, "area": 0, "layers": []},
+        )
+        self.extra_losses = kwargs.get("extra_losses", {})
 
         self.__centring()
 
@@ -177,31 +159,25 @@ class Building:
         self.weather_data = {}
         self.power_data = {}
         self.power_data_by_days = None
-        self.location = Location(
-            latitude=geo['latitude'],
-            longitude=geo['longitude'],
-        )
+        self.location = Location(latitude=geo["latitude"], longitude=geo["longitude"],)
         self.pv = PVSystem(
             surface_tilt=45,
             surface_azimuth=180,
-            module_parameters={'pdc0': 240, 'gamma_pdc': -0.004},
-            inverter_parameters={'pdc0': 240},
+            module_parameters={"pdc0": 240, "gamma_pdc": -0.004},
+            inverter_parameters={"pdc0": 240},
             temperature_model_parameters=temp_model_pars,
         )
         self.mc = ModelChain(
-            self.pv,
-            self.location,
-            aoi_model='no_loss',
-            spectral_model='no_loss')
+            self.pv, self.location, aoi_model="no_loss", spectral_model="no_loss"
+        )
         return
 
     def __correct_wall_thickness(self) -> None:
         """ Method for correct the wall thickness. """
         for base in self.mesh.bounding_box.primitive.extents:
-            scale_factor = (base - self.wall_thickness*2)/base
+            scale_factor = (base - self.wall_thickness * 2) / base
             if scale_factor < 0:
-                self.wall_thickness = min(
-                    self.mesh.bounding_box.primitive.extents)/2
+                self.wall_thickness = min(self.mesh.bounding_box.primitive.extents) / 2
         return
 
     def __centring(self):
@@ -221,7 +197,7 @@ class Building:
         if self.__mesh_inside:
             return self.__mesh_inside
         for base in self.mesh.bounding_box.primitive.extents:
-            scale_factor = (base - self.wall_thickness*2)/base
+            scale_factor = (base - self.wall_thickness * 2) / base
             factors.append(scale_factor)
         if factors != [0.0, 0.0, 0.0]:
             matrix = np.diag(factors + [1.0])
@@ -231,25 +207,17 @@ class Building:
     @property
     def walls_area_inside(self):
         """Calculates area of walls inside the house"""
-        area = (
-            self.mesh_inside.area -
-            self.windows['area'] -
-            self.floor_area_inside
-        )
+        area = self.mesh_inside.area - self.windows["area"] - self.floor_area_inside
         if area < 0:
-            raise Exception('Area is null')
+            raise Exception("Area is null")
         return area
 
     @property
     def walls_area_outside(self):
         """Calculates area of walls outside the house"""
-        area = (
-            self.mesh.area -
-            self.windows['area'] -
-            self.floor_area_outside
-        )
+        area = self.mesh.area - self.windows["area"] - self.floor_area_outside
         if area < 0:
-            raise Exception('Area is null')
+            raise Exception("Area is null")
         return area
 
     @property
@@ -263,35 +231,25 @@ class Building:
     @property
     def volume_air_inside(self) -> float:
         """Calculates volume of the air inside the house"""
-        return (
-            self.mesh_inside.volume -
-            self.heat_accumulator_volume
-        )
+        return self.mesh_inside.volume - self.heat_accumulator_volume
 
     @property
     def floor_thickness(self) -> float:
         """Get floor thickness"""
-        if 'thickness' in self.floor and self.floor['thickness']:
-            return self.floor['thickness']
+        if "thickness" in self.floor and self.floor["thickness"]:
+            return self.floor["thickness"]
         return self.wall_thickness
 
     @property
     def heat_accumulator_volume(self):
         """Get volume of heat accumulator"""
-        if (
-                'volume' in self.heat_accumulator and
-                self.heat_accumulator['volume']
-        ):
-            return self.heat_accumulator['volume']
-        if (
-                'material' in self.heat_accumulator and
-                self.heat_accumulator['material']
-        ):
-            return self.get_prop(
-                self.heat_accumulator['material'],
-                'density'
-            ) * self.heat_accumulator['mass']
-        return self.heat_accumulator['mass'] / self.heat_accumulator['density']
+        if "volume" in self.heat_accumulator and self.heat_accumulator["volume"]:
+            return self.heat_accumulator["volume"]
+        if "material" in self.heat_accumulator and self.heat_accumulator["material"]:
+            return (
+                self.get_prop(self.heat_accumulator["material"], "density") * self.heat_accumulator["mass"]
+            )
+        return self.heat_accumulator["mass"] / self.heat_accumulator["density"]
 
     @property
     def area_mass_walls_inside(self) -> float:
@@ -299,7 +257,7 @@ class Building:
         inside of the house."""
         if not self.heat_accumulator:
             return 0
-        p = self.get_perimeter_floor('inside')
+        p = self.get_perimeter_floor("inside")
         h = self.heat_accumulator_volume / self.floor_area_inside
         return p * h
 
@@ -307,11 +265,11 @@ class Building:
     def area_mass_walls_outside(self) -> float:
         """Calculates area of the walls around the heat accumulator outside of
          the house."""
-        p = self.get_perimeter_floor('outside')
+        p = self.get_perimeter_floor("outside")
         h = self.heat_accumulator_volume / self.floor_area_inside
         th = self.wall_thickness
-        if 'thickness' in self.floor and self.floor['thickness']:
-            th = self.floor['thickness']
+        if "thickness" in self.floor and self.floor["thickness"]:
+            th = self.floor["thickness"]
         return (h + th) * p
 
     @property
@@ -328,8 +286,8 @@ class Building:
         """Calculates area floor inside of the house"""
         area = 0
         for norm, area_f in zip(
-                self.mesh_inside.face_normals,
-                self.mesh_inside.area_faces):
+            self.mesh_inside.face_normals, self.mesh_inside.area_faces
+        ):
             if norm[2] == -1:
                 area += area_f
         return area
@@ -342,14 +300,14 @@ class Building:
         :return:
             float value of perimeter
         """
-        if where == 'outside':
+        if where == "outside":
             return self.mesh.section(
-                plane_origin=self.mesh.bounds[0],
-                plane_normal=[0, 0, 1]).length
+                plane_origin=self.mesh.bounds[0], plane_normal=[0, 0, 1]
+            ).length
         else:
             return self.mesh_inside.section(
-                plane_origin=self.mesh_inside.bounds[0],
-                plane_normal=[0, 0, 1]).length
+                plane_origin=self.mesh_inside.bounds[0], plane_normal=[0, 0, 1]
+            ).length
 
     def get_efficient_angle(self, reflect_material: dict = None) -> float:
         """ Get angle for material. """
@@ -357,10 +315,8 @@ class Building:
         return ang
 
     def calc_reflect_power(
-            self,
-            power: float,
-            sun_ang: float,
-            cover_material: str = 'polycarbonat') -> float:
+        self, power: float, sun_ang: float, cover_material: str = "polycarbonat"
+    ) -> float:
         """
         Calculates
         power of reflection based on :
@@ -372,14 +328,9 @@ class Building:
         #                  'glass':1.4}
         #    dict_ki_mat = {'polycarbonat':0.82,
         #                    'glass':0.86}
-        table_kr_mat = {'polycarbonat': {
-                                        40: 0.04,
-                                        50: 0.06,
-                                        60: 0.1,
-                                        70: 0.18,
-                                        80: 0.4,
-                                        90: 1},
-                        }
+        table_kr_mat = {
+            "polycarbonat": {40: 0.04, 50: 0.06, 60: 0.1, 70: 0.18, 80: 0.4, 90: 1},
+        }
         kr = 1
         for k, v in table_kr_mat[cover_material].items():
             if math.degrees(sun_ang) <= k:
@@ -389,10 +340,8 @@ class Building:
         return refl_power
 
     def get_pv_power_face(
-            self,
-            face_tilt: float,
-            face_azimuth: float,
-            face_area: float) -> float:
+        self, face_tilt: float, face_azimuth: float, face_area: float
+    ) -> float:
         """
         Get Irradiation from PVLIB.
 
@@ -404,7 +353,7 @@ class Building:
         self.pv.surface_tilt = face_tilt
         self.pv.surface_azimuth = face_azimuth
         self.mc.run_model(self.weather_data)
-        return self.mc.effective_irradiance * face_area * (self.efficiency/100)
+        return self.mc.effective_irradiance * face_area * (self.efficiency / 100)
 
     def projection_on_flat(self, vector: tuple) -> tuple:
         """ get vector what is projection vector on the flat plane. """
@@ -432,35 +381,28 @@ class Building:
             index = 0
             for face in self.mesh.faces:
                 tri = [self.mesh.vertices[i].tolist() for i in face]
-                face_area = triangles.area((tri, ))
-                face_normal = triangles.normals((tri, ))[0][0]
+                face_area = triangles.area((tri,))
+                face_normal = triangles.normals((tri,))[0][0]
                 face_tilt = geometry.vector_angle((face_normal, (0, 0, 1)))
                 face_normal_projection = self.projection_on_flat(face_normal)
                 face_azimuth = geometry.vector_angle(
                     (face_normal_projection, (0, 1, 0))
                 )
                 sun_power_face = self.get_pv_power_face(
-                    face_tilt,
-                    face_azimuth,
-                    face_area,
+                    face_tilt, face_azimuth, face_area,
                 )
-                face_seria = pd.Series(
-                    sun_power_face,
-                    index=self.weather_data.index,
-                    )
+                face_seria = pd.Series(sun_power_face, index=self.weather_data.index,)
                 dict_temp_data.update({index: face_seria})
                 face_indexes.append(index)
                 index += 1
         self.power_data = pd.DataFrame(dict_temp_data)
         fields = list(self.power_data)
-        self.power_data['sum_solar_power'] = self.power_data[fields]\
-            .sum(axis=1)
-        self.power_data['maximum_solar_power'] = self.power_data[fields]\
-            .max(axis=1)
-        self.power_data['ind_face'] = self.power_data[fields]\
-            .idxmax(axis=1)
-        self.power_data_by_days = self.power_data['sum_solar_power']\
-            .resample('1D').mean()
+        self.power_data["sum_solar_power"] = self.power_data[fields].sum(axis=1)
+        self.power_data["maximum_solar_power"] = self.power_data[fields].max(axis=1)
+        self.power_data["ind_face"] = self.power_data[fields].idxmax(axis=1)
+        self.power_data_by_days = (
+            self.power_data["sum_solar_power"].resample("1D").mean()
+        )
         return
 
     def get_prop(self, material: str, prop: str) -> float:
@@ -474,10 +416,11 @@ class Building:
         if material not in self.dict_properties_materials:
             material = self.material
         if prop == "kappa":
-            return self.dict_properties_materials[material]['transcalency']
+            return self.dict_properties_materials[material]["transcalency"]
         return self.dict_properties_materials[material][prop]
 
 
 if __name__ == "__main__":
     import doctest
+
     doctest.testmod()

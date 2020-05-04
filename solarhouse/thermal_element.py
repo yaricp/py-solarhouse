@@ -81,13 +81,8 @@ class ThermalElement:
     """
 
     def __init__(
-            self,
-            name,
-            temp0=None,
-            density=None,
-            heat_capacity=None,
-            volume=None,
-            **kwargs):
+        self, name, temp0=None, density=None, heat_capacity=None, volume=None, **kwargs
+    ):
         """Initialize object of class Element"""
         self.name = name
         self.temp = temp0
@@ -95,29 +90,26 @@ class ThermalElement:
         self.density = density
         self.heat_capacity = heat_capacity
         self.volume = volume
-        self.thickness = kwargs.get('thickness', None)
-        self.kappa = kwargs.get('kappa', 0.04)
-        self.layers = kwargs.get('layers', {})
-        self.dx = kwargs.get('dx', None)
-        self.area_inside = kwargs.get('area_inside', None)
-        self.area_outside = kwargs.get('area_outside', None)
-        self.input_alpha = kwargs.get('input_alpha', None)
+        self.thickness = kwargs.get("thickness", None)
+        self.kappa = kwargs.get("kappa", 0.04)
+        self.layers = kwargs.get("layers", {})
+        self.dx = kwargs.get("dx", None)
+        self.area_inside = kwargs.get("area_inside", None)
+        self.area_outside = kwargs.get("area_outside", None)
+        self.input_alpha = kwargs.get("input_alpha", None)
 
         self.branches_loss = []
         self.counter = 0
         self.count_layers = 1
         self.dTx_list = [self.temp]
         if self.thickness and self.dx:
-            self.count_layers = int(self.thickness/self.dx)
+            self.count_layers = int(self.thickness / self.dx)
             self.dTx_list = list(np.ones(self.count_layers) * self.temp)
         self.k_area = None
-        if (self.area_inside and
-                self.area_outside and
-                self.area_outside > self.area_inside):
-            self.k_area = (
-                (self.area_outside - self.area_inside) /
-                self.thickness
-            )
+        if (
+            self.area_inside and self.area_outside and self.area_outside > self.area_inside
+        ):
+            self.k_area = (self.area_outside - self.area_inside) / self.thickness
 
     def init_conditions(self, val):
         """Reduction to initial conditions"""
@@ -137,10 +129,7 @@ class ThermalElement:
             Float value of area
         """
         if self.k_area:
-            return (
-                    self.area_inside +
-                    iterator * self.dx * self.k_area
-                )
+            return self.area_inside + iterator * self.dx * self.k_area
 
     def __get_kappa_dx(self, iterator):
         """
@@ -167,11 +156,7 @@ class ThermalElement:
 
     def calc_loss_input_q(self, t_in: float) -> float:
         """Calculates loss energy between current and previous elements"""
-        return (
-                self.input_alpha *
-                self.area_inside *
-                (t_in - self.temp)
-            )
+        return self.input_alpha * self.area_inside * (t_in - self.temp)
 
     def get_loss_dx(self, iterator):
         """
@@ -195,11 +180,8 @@ class ThermalElement:
         return q_loss
 
     def calc_temp(
-            self,
-            q_enter: float,
-            q_loss: float,
-            iterator: int,
-            dt: float) -> None:
+        self, q_enter: float, q_loss: float, iterator: int, dt: float
+    ) -> None:
         """
         Calculates the dT on dt of current point (dx) of element.
         If element represent as a point then calculates.
@@ -249,4 +231,5 @@ class ThermalElement:
 
 if __name__ == "__main__":
     import doctest
+
     doctest.testmod()

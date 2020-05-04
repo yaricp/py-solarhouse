@@ -20,17 +20,17 @@ class Calculation:
     """
 
     def __init__(
-                self,
-                tz: str,
-                building_mesh_file_path: str,
-                geo: dict,
-                wall_material: str,
-                wall_thickness: float,
-                start_temp_in: float,
-                power_heat_inside: float = 0.0,
-                efficiency_collector: float = None,
-                **kwargs
-                ):
+        self,
+        tz: str,
+        building_mesh_file_path: str,
+        geo: dict,
+        wall_material: str,
+        wall_thickness: float,
+        start_temp_in: float,
+        power_heat_inside: float = 0.0,
+        efficiency_collector: float = None,
+        **kwargs
+    ):
         """ Initialize object for calculate sun power. """
         self.id = str(uuid.uuid4())
         self.progress = 0
@@ -49,28 +49,20 @@ class Calculation:
         )
 
     def compute(
-            self,
-            date: datetime.datetime = None,
-            month: datetime.datetime = None,
-            year: datetime.datetime = None,
-            period: tuple = None,
-            with_weather: bool = True
-            ) -> None:
+        self,
+        date: datetime.datetime = None,
+        month: datetime.datetime = None,
+        year: datetime.datetime = None,
+        period: tuple = None,
+        with_weather: bool = True,
+    ) -> None:
         """ proxy method for prepare period and calculations. """
         start, end = prepare_period(
-            tz=self.tz,
-            date=date,
-            month=month,
-            year=year,
-            period=period
+            tz=self.tz, date=date, month=month, year=year, period=period
         )
         return self.start_calculation(start, end, with_weather=with_weather)
 
-    def __get_weather(
-            self,
-            start: pd.Timestamp,
-            end: pd.Timestamp
-    ) -> pd.DataFrame:
+    def __get_weather(self, start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame:
         """
         Get weather data for period.
         :param start: - pd.Timestamp, begin of period
@@ -80,16 +72,11 @@ class Calculation:
         """
         fx_model = GFS()
         return fx_model.get_processed_data(
-            self.geo['latitude'],
-            self.geo['longitude'],
-            start,
-            end)
+            self.geo["latitude"], self.geo["longitude"], start, end
+        )
 
     def __get_clear_sky(
-            self,
-            start: pd.Timestamp,
-            end: pd.Timestamp,
-            model: str = 'ineichen'
+        self, start: pd.Timestamp, end: pd.Timestamp, model: str = "ineichen"
     ) -> pd.DataFrame:
         """
         Get sun data of irradiation of sun without weather.
@@ -100,14 +87,11 @@ class Calculation:
         :return: pd.DataFrame,
             Column names are: ``ghi, dni, dhi``
         """
-        period = pd.date_range(start=start, end=end, freq='1h', tz=self.tz)
+        period = pd.date_range(start=start, end=end, freq="1h", tz=self.tz)
         return self.building.location.get_clearsky(period, model=model)
 
     def start_calculation(
-            self,
-            start: pd.Timestamp,
-            end: pd.Timestamp,
-            with_weather: bool = True
+        self, start: pd.Timestamp, end: pd.Timestamp, with_weather: bool = True
     ) -> None:
         """ Start calculations. """
         get_weather = self.__get_clear_sky
@@ -118,8 +102,8 @@ class Calculation:
         thermal_process = ThermalProcess(
             t_start=20,
             building=self.building,
-            variant='heat_to_mass',
-            for_plots=['mass', 'room']
+            variant="heat_to_mass",
+            for_plots=["mass", "room"],
         )
         self.pd_data_for_export = thermal_process.run_process()
         return self.pd_data_for_export
@@ -127,4 +111,5 @@ class Calculation:
 
 if __name__ == "__main__":
     import doctest
+
     doctest.testmod()
