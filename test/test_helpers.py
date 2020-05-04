@@ -44,9 +44,9 @@ def test_month():
 
 def test_date():
     start, end = prepare_period(tz=tz, date=17)
-    month_now = datetime.datetime.now().month
     assert type(start) == pd.Timestamp
     assert type(end) == pd.Timestamp
+    month_now = datetime.datetime.now().month
     assert start == pd.Timestamp(
         '2020-%s-17 00:00:00+0700' % month_now,
         tz='Asia/Novosibirsk'

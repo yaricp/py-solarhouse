@@ -10,6 +10,15 @@ def prepare_period(
             year: datetime.datetime = None,
             period: tuple = None,
         ) -> tuple:
+    """
+    Prepare period for retrive data of wheather and calculate sun power.
+    :param tz:  - time zone of geoposition of building
+    :param date:
+    :param month:
+    :param year:
+    :param period:
+    :return: tuple (start , end) - begin and end of period.
+    """
     if year and not month and not date:
         year = datetime.datetime(day=1, month=1, year=year)
         start = pd.Timestamp(year, tz=tz)

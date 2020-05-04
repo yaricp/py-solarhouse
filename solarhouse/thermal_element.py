@@ -131,7 +131,7 @@ class ThermalElement:
     def __get_area_dx(self, iterator):
         """
         Calculates area of loss power for current dx.
-        Returns
+
         :param iterator: number of dx
         :return:
             Float value of area
@@ -145,6 +145,7 @@ class ThermalElement:
     def __get_kappa_dx(self, iterator):
         """
         Calculate the kappa if it depends of dx
+
         :param iterator: number of dx
         :return:
             Float value of thermal resistance of dx layer.
@@ -177,9 +178,9 @@ class ThermalElement:
         Defines loss energy from current element on dx or from all
         element if it represent in calculation as a point.
         q_loss = alpha*area_branch*(T_current - T_branch)
+
         :param iterator: number of dx, 0 if element as a point
-        :return:
-            Float value of all loss power
+        :return: Float value of all loss power
         """
         temp1 = self.dTx_list[iterator]
         temp2 = self.dTx_list[iterator + 1]
@@ -203,8 +204,8 @@ class ThermalElement:
         Calculates the dT on dt of current point (dx) of element.
         If element represent as a point then calculates.
         Tdx = Tdx0 + (q_enter - q_loss)/cmdx
-        :param q_enter: enter power from previouse element or
-            source of power
+
+        :param q_enter: enter power from previouse element or source of power
         :param q_loss: total power loss from current point dx
         :param iterator: number of current dx
         :param dt: range of time for calculate
@@ -223,11 +224,11 @@ class ThermalElement:
         """
         Start of calculate temperature of element if
         it represent as a point or calculate of all
-        temperatures by dx if element has the dx parameter.
+        temperatures by dx if element has the dx parameter
+
         :param q_enter: input power
         :param dt: range of time
-        :return:
-            change self.temp parameter in the end of calculation
+        :return: change self.temp parameter in the end of calculation
         """
         if not self.heat_capacity or not self.density:
             return

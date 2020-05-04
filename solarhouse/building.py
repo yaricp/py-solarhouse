@@ -41,7 +41,8 @@ class Building:
     """
     Class implements methods for work with buildings for which calculate
     sun energy.
-    Test for cube 1x1x1 meter :
+    Example: create building and test some it`s parameters.
+
     >>> text = 'o Cube\\n'
     >>> text += 'v 1.000000 1.000000 -1.000000\\n'
     >>> text += 'v 1.000000 0.000000 -1.000000\\n'
@@ -336,8 +337,10 @@ class Building:
     def get_perimeter_floor(self, where: str) -> float:
         """
         Calculate perimeter of floor
+
         :param where: 'inside' or 'outside'
-        :return: float value of perimeter
+        :return:
+            float value of perimeter
         """
         if where == 'outside':
             return self.mesh.section(
@@ -392,10 +395,11 @@ class Building:
             face_area: float) -> float:
         """
         Get Irradiation from PVLIB.
-        :param face_tilt:
-        :param face_azimuth:
-        :param face_area:
-        :return:
+
+        :param face_tilt: angle between normal of face and horizontal plane
+        :param face_azimuth: angle between normal of face and north direction
+        :param face_area: float value of area of face
+        :return: pandas DataFrame with sun power of current period.
         """
         self.pv.surface_tilt = face_tilt
         self.pv.surface_azimuth = face_azimuth
@@ -413,6 +417,7 @@ class Building:
     def calc_sun_power_on_faces(self) -> None:
         """
         Calculates the power of sun on all faces of the building.
+
         :return: self
             changed self.power_data, self.power_data_by_days
         """
@@ -461,6 +466,7 @@ class Building:
     def get_prop(self, material: str, prop: str) -> float:
         """
         Retrive a value of property for some materials.
+
         :param material: string of name material
         :param prop: string of name property
         :return: float of value property

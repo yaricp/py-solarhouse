@@ -44,7 +44,6 @@ class ThermalProcess:
         This elements can be combined to three variant
         (power to massive object, power to air, power to walls).
         dx for non-homogeneous elements is in meters.
-
         """
         self.count = 0
         self.seconds = 60
@@ -202,6 +201,7 @@ class ThermalProcess:
         """
         Start main calculation process.
         In the end of process it show a plots of temperatures
+
         :return: dict data of elements in house for plots.
         """
         self.seconds = 60 * 60

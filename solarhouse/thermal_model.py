@@ -42,7 +42,7 @@ class ThermalModel:
         :param power: input power in first thermal element (Watt)
         :param t_out: temperature of last element
         :return:
-            - dict of data of temperatures of elements.
+            dict of data of temperatures of elements.
         """
         for el in self.outside_elements:
             el.temp = t_out

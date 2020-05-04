@@ -1,8 +1,7 @@
-import os
 import datetime
+import uuid
 import pytz
 
-import uuid
 
 import pandas as pd
 from pvlib.forecast import GFS
