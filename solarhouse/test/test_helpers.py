@@ -45,25 +45,26 @@ def test_month():
 def test_date():
     start, end = prepare_period(tz=tz, date=17)
     month_now = datetime.datetime.now().month
+    year_now = datetime.datetime.now().year
     assert type(start) == pd.Timestamp
     assert type(end) == pd.Timestamp
     assert start == pd.Timestamp(
-        '2020-%s-17 00:00:00+0700' % month_now,
+        '%s-%s-17 00:00:00+0700' % (year_now, month_now),
         tz='Asia/Novosibirsk'
     )
     assert end == pd.Timestamp(
-        '2020-%s-18 00:00:00+0700' % month_now,
+        '%s-%s-18 00:00:00+0700' % (year_now, month_now),
         tz='Asia/Novosibirsk'
     )
     start, end = prepare_period(tz=tz, date=17, month=5)
     assert type(start) == pd.Timestamp
     assert type(end) == pd.Timestamp
     assert start == pd.Timestamp(
-        '2020-05-17 00:00:00+0700',
+        '%s-05-17 00:00:00+0700' % year_now,
         tz='Asia/Novosibirsk'
     )
     assert end == pd.Timestamp(
-        '2020-05-18 00:00:00+0700',
+        '%s-05-18 00:00:00+0700' % year_now,
         tz='Asia/Novosibirsk'
     )
     start, end = prepare_period(tz=tz, date=17, year=2017)
