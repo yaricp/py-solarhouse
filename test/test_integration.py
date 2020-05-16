@@ -2,8 +2,9 @@ import os
 import filecmp
 import shutil
 
-import export as ex
+from building import Building
 from calculation import Calculation
+import export as ex
 
 
 def test_main(mesh_file_path, tmpdir):
@@ -15,7 +16,29 @@ def test_main(mesh_file_path, tmpdir):
     calc = Calculation(
         tz=tz,
         geo=geo,
-        building=dict(),
+        building=Building(
+            mesh_file=mesh_file_path,
+            geo=geo,
+            wall_material="adobe",
+            wall_thickness=0.3,
+            start_temp_in=20.0,
+            power_heat_inside=0.0,
+            efficiency=75,
+            heat_accumulator={
+                'volume': 0.032,
+                'material': 'water',
+            },
+            windows={
+                'area': 0.3,
+                'therm_r': 5.0,
+            },
+            floor={
+                'area': 1.0,
+                'material': 'adobe',
+                'thickness': 0.2,
+                't_out': 4.0,
+            },
+        ),
         building_mesh_file_path=mesh_file_path,
         wall_material='adobe',
         wall_thickness=0.3,
