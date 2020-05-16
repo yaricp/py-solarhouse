@@ -22,6 +22,7 @@ class Calculation:
         self,
         tz: str,
         geo: dict,
+        building: dict,
         building_mesh_file_path: str,
         wall_material: str,
         wall_thickness: float,

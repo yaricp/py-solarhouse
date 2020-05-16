@@ -14,8 +14,9 @@ def test_main(mesh_file_path, tmpdir):
     }
     calc = Calculation(
         tz=tz,
-        building_mesh_file_path=mesh_file_path,
         geo=geo,
+        building=dict(),
+        building_mesh_file_path=mesh_file_path,
         wall_material='adobe',
         wall_thickness=0.3,
         start_temp_in=20.0,

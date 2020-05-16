@@ -7,14 +7,15 @@ import solarhouse.export as export
 
 def main():
     calc = Calculation(
-        settings.TZ,
-        settings.GEO,
-        settings.PATH_FILE_OBJECT,
-        settings.WALL_MATERIAL,
-        settings.WALL_THICKNESS,
-        settings.TEMPERATURE_START,
-        settings.POWER_HEAT_INSIDE,
-        settings.EFF,
+        tz=settings.TZ,
+        geo=settings.GEO,
+        building=dict(),
+        building_mesh_file_path=settings.PATH_FILE_OBJECT,
+        wall_material=settings.WALL_MATERIAL,
+        wall_thickness=settings.WALL_THICKNESS,
+        start_temp_in=settings.TEMPERATURE_START,
+        power_heat_inside=settings.POWER_HEAT_INSIDE,
+        efficiency_collector=settings.EFF,
         heat_accumulator={
             'volume': 0.02,
             'material': 'water',
