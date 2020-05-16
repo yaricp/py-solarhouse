@@ -19,15 +19,16 @@ def main():
                         windows={'area': 0.3, 'therm_r': 5.0},
                         floor={'area': 1.0, 'material': 'adobe', 'thickness': 0.2, 't_out': 4.0},
                     )
-    date = datetime.datetime(day=22, month=7, year=2019)
-    calc_id = calc.id
-    if not os.path.exists(os.path.join(settings.PATH_OUTPUT, calc_id)):
-        os.mkdir(os.path.join(settings.PATH_OUTPUT, calc_id))
+
     data_frame = calc.compute(date=22, month=12, year=2019, with_weather=False)
-    export.as_file(data_frame, 'csv', os.path.join(settings.PATH_OUTPUT, calc_id))
-    export.as_html(data_frame, os.path.join(settings.PATH_OUTPUT, calc_id))
+
+    output_dir = os.path.join(settings.PATH_OUTPUT, calc.id)
+    os.makedirs(output_dir, exist_ok=True)
+
+    csv_file_path = export.as_file(data_frame, 'csv', output_dir)
+    export.as_html(data_frame, output_dir)
    
-    with open(os.path.join(settings.PATH_OUTPUT, calc_id, 'data.csv'), 'r') as file:
+    with open(csv_file_path, 'r') as file:
         print(file.read())
 
 
