@@ -1,7 +1,6 @@
 import datetime
-import uuid
 import pytz
-
+import uuid
 
 import pandas as pd
 from pvlib.forecast import GFS
@@ -22,8 +21,8 @@ class Calculation:
     def __init__(
         self,
         tz: str,
-        building_mesh_file_path: str,
         geo: dict,
+        building_mesh_file_path: str,
         wall_material: str,
         wall_thickness: float,
         start_temp_in: float,
