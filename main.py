@@ -33,26 +33,6 @@ def main():
                 't_out': 4.0,
             },
         ),
-        building_mesh_file_path=settings.PATH_FILE_OBJECT,
-        wall_material=settings.WALL_MATERIAL,
-        wall_thickness=settings.WALL_THICKNESS,
-        start_temp_in=settings.TEMPERATURE_START,
-        power_heat_inside=settings.POWER_HEAT_INSIDE,
-        efficiency_collector=settings.EFF,
-        heat_accumulator={
-            'volume': 0.02,
-            'material': 'water',
-        },
-        windows={
-            'area': 0.3,
-            'therm_r': 5.0,
-        },
-        floor={
-            'area': 1.0,
-            'material': 'adobe',
-            'thickness': 0.2,
-            't_out': 4.0,
-        },
     )
 
     data_frame = calc.compute(date=22, month=12, year=2019, with_weather=False)

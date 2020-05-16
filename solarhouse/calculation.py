@@ -23,13 +23,6 @@ class Calculation:
         tz: str,
         geo: dict,
         building: Building,
-        building_mesh_file_path: str,
-        wall_material: str,
-        wall_thickness: float,
-        start_temp_in: float,
-        power_heat_inside: float = 0.0,
-        efficiency_collector: float = None,
-        **kwargs
     ):
         """ Initialize object for calculate sun power. """
         self.id = str(uuid.uuid4())
@@ -37,16 +30,7 @@ class Calculation:
         self.geo = geo
         self.tz = pytz.timezone(tz)
         self.pd_data_for_export = None
-        self.building = Building(
-            building_mesh_file_path,
-            geo,
-            wall_material,
-            wall_thickness,
-            start_temp_in,
-            power_heat_inside,
-            efficiency_collector,
-            **kwargs
-        )
+        self.building = building
 
     def compute(
         self,
