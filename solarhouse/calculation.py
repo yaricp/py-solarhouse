@@ -57,7 +57,11 @@ class Calculation:
     ) -> None:
         """ proxy method for prepare period and calculations. """
         start, end = prepare_period(
-            tz=self.tz, date=date, month=month, year=year, period=period
+            tz=self.tz,
+            date=date,
+            month=month,
+            year=year,
+            period=period,
         )
         return self.start_calculation(start, end, with_weather=with_weather)
 

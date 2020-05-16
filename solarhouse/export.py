@@ -6,7 +6,9 @@ import pandas as pd
 
 
 def as_file(
-    pd_data: pd.DataFrame, type_file: str = "csv", path: str = "output"
+    pd_data: pd.DataFrame,
+    type_file: str = "csv",
+    path: str = "output",
 ) -> None:
     """ Export results to file. """
 
