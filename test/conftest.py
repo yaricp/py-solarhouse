@@ -47,7 +47,7 @@ def building(mesh_file_path):
             'density': 700.0,
             'transcalency': 0.15,
             'heat_capacity': 1250.0
-        }
+        },
     }
     ret = Building(
         mesh_file=mesh_file_path,
