@@ -2,7 +2,7 @@ import datetime
 import pytz
 import pandas as pd
 
-from helpers import prepare_period
+from solarhouse.helpers import prepare_period
 
 tz = pytz.timezone('Asia/Novosibirsk')
 

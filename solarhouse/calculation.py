@@ -5,9 +5,9 @@ import uuid
 import pandas as pd
 from pvlib.forecast import GFS
 
-from building import Building
-from thermal_process import ThermalProcess
-from helpers import prepare_period
+from .building import Building
+from .thermal_process import ThermalProcess
+from .helpers import prepare_period
 
 
 class Calculation:

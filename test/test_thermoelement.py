@@ -1,4 +1,4 @@
-from thermal_element import ThermalElement
+from solarhouse.thermal_element import ThermalElement
 
 
 def test_cube_water():

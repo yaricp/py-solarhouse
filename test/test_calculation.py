@@ -1,5 +1,5 @@
-from building import Building
-from calculation import Calculation
+from solarhouse.building import Building
+from solarhouse.calculation import Calculation
 
 
 def test_create_calculation(mesh_file_path):
@@ -17,6 +17,6 @@ def test_create_calculation(mesh_file_path):
             wall_thickness=0.1,
             start_temp_in=15.0,
             power_heat_inside=500,
-            efficiency=0.6,
+            efficiency=0.6,  # TODO: 60?
         ),
     )

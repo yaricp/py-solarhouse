@@ -2,9 +2,9 @@ import os
 import filecmp
 import shutil
 
-from building import Building
-from calculation import Calculation
-import export as ex
+from solarhouse.building import Building
+from solarhouse.calculation import Calculation
+import solarhouse.export as export
 
 
 def test_main(mesh_file_path, tmpdir):
@@ -44,10 +44,10 @@ def test_main(mesh_file_path, tmpdir):
 
     output_dir = tmpdir
 
-    ex.as_file(data_frame, 'csv', output_dir)
+    export.as_file(data_frame, 'csv', output_dir)
     res_file = os.path.join(output_dir, 'data.csv')
     ref_res_file = os.path.join('test/ref_files', 'data.csv')
     assert filecmp.cmp(res_file, ref_res_file)
 
-    ex.as_html(data_frame, output_dir)
+    export.as_html(data_frame, output_dir)
     assert os.path.exists(os.path.join(output_dir, 'plots.html'))

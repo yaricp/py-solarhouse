@@ -9,7 +9,7 @@ from pvlib.temperature import TEMPERATURE_MODEL_PARAMETERS
 
 from trimesh import geometry, load, triangles
 
-import settings
+from . import settings
 
 temp_model_pars = TEMPERATURE_MODEL_PARAMETERS["sapm"]["open_rack_glass_glass"]
 
