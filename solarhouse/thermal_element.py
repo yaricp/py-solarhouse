@@ -80,9 +80,7 @@ class ThermalElement:
     115.0
     """
 
-    def __init__(
-        self, name, temp0=None, density=None, heat_capacity=None, volume=None, **kwargs
-    ):
+    def __init__(self, name, temp0=None, density=None, heat_capacity=None, volume=None, **kwargs):
         """Initialize object of class Element"""
         self.name = name
         self.temp = temp0
@@ -106,9 +104,7 @@ class ThermalElement:
             self.count_layers = int(self.thickness / self.dx)
             self.dTx_list = list(np.ones(self.count_layers) * self.temp)
         self.k_area = None
-        if (
-            self.area_inside and self.area_outside and self.area_outside > self.area_inside
-        ):
+        if self.area_inside and self.area_outside and self.area_outside > self.area_inside:
             self.k_area = (self.area_outside - self.area_inside) / self.thickness
 
     def init_conditions(self, val):
@@ -179,9 +175,7 @@ class ThermalElement:
 
         return q_loss
 
-    def calc_temp(
-        self, q_enter: float, q_loss: float, iterator: int, dt: float
-    ) -> None:
+    def calc_temp(self, q_enter: float, q_loss: float, iterator: int, dt: float) -> None:
         """
         Calculates the dT on dt of current point (dx) of element.
         If element represent as a point then calculates.

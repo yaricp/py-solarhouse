@@ -25,9 +25,9 @@ f 6/10/4 2/11/4 4/12/4 8/13/4
 f 2/14/5 1/15/5 3/16/5 4/17/5
 f 6/18/6 5/19/6 1/20/6 2/11/6
 """
-    output_file_path = 'test/test_file.obj'
+    output_file_path = "test/test_file.obj"
 
-    with open(output_file_path, 'w') as file:
+    with open(output_file_path, "w") as file:
         file.write(text)
 
     yield output_file_path
@@ -38,19 +38,9 @@ f 6/18/6 5/19/6 1/20/6 2/11/6
 @pytest.fixture(scope="session")
 def building(mesh_file_path):
     """Create building for tests"""
-    geo = {'latitude': 54.841426, 'longitude': 83.264479}
-    material = {
-        'birch': {
-            'density': 700.0,
-            'transcalency': 0.15,
-            'heat_capacity': 1250.0
-            }
-        }
+    geo = {"latitude": 54.841426, "longitude": 83.264479}
+    material = {"birch": {"density": 700.0, "transcalency": 0.15, "heat_capacity": 1250.0}}
     ret = Building(
-        mesh_file=mesh_file_path,
-        geo=geo,
-        wall_thickness=0.3,
-        wall_material='birch',
-        properties_materials=material
+        mesh_file=mesh_file_path, geo=geo, wall_thickness=0.3, wall_material="birch", properties_materials=material,
     )
     return ret

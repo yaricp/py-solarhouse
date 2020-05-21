@@ -135,21 +135,12 @@ class Building:
         self.dict_properties_materials = properties_materials
         self.wall_layers = kwargs.get("wall_layers", None)
         self.dict_power_inside = kwargs.get("dict_power_inside", None)
-        self.dict_properties_materials = kwargs.get(
-            "properties_materials", properties_materials
-        )
+        self.dict_properties_materials = kwargs.get("properties_materials", properties_materials)
         self.ventilation_losses = kwargs.get("ventilation_losses", 0)
         self.heat_accumulator = heat_accumulator
-        self.windows = kwargs.get(
-            "windows", {"therm_r": 0.0, "losses": 0.0, "area": 0.0}
-        )
-        self.floor = kwargs.get(
-            "floor", {"material": self.material, "therm_r": 0, "area": 0, "layers": []}
-        )
-        self.ceiling = kwargs.get(
-            "ceiling",
-            {"material": self.material, "therm_r": 0, "area": 0, "layers": []},
-        )
+        self.windows = kwargs.get("windows", {"therm_r": 0.0, "losses": 0.0, "area": 0.0})
+        self.floor = kwargs.get("floor", {"material": self.material, "therm_r": 0, "area": 0, "layers": []})
+        self.ceiling = kwargs.get("ceiling", {"material": self.material, "therm_r": 0, "area": 0, "layers": []},)
         self.extra_losses = kwargs.get("extra_losses", {})
 
         self.__centring()
@@ -167,9 +158,7 @@ class Building:
             inverter_parameters={"pdc0": 240},
             temperature_model_parameters=temp_model_pars,
         )
-        self.mc = ModelChain(
-            self.pv, self.location, aoi_model="no_loss", spectral_model="no_loss"
-        )
+        self.mc = ModelChain(self.pv, self.location, aoi_model="no_loss", spectral_model="no_loss")
         return
 
     def __correct_wall_thickness(self) -> None:
@@ -246,9 +235,7 @@ class Building:
         if "volume" in self.heat_accumulator and self.heat_accumulator["volume"]:
             return self.heat_accumulator["volume"]
         if "material" in self.heat_accumulator and self.heat_accumulator["material"]:
-            return (
-                self.get_prop(self.heat_accumulator["material"], "density") * self.heat_accumulator["mass"]
-            )
+            return self.get_prop(self.heat_accumulator["material"], "density") * self.heat_accumulator["mass"]
         return self.heat_accumulator["mass"] / self.heat_accumulator["density"]
 
     @property
@@ -285,9 +272,7 @@ class Building:
     def floor_area_inside(self) -> float:
         """Calculates area floor inside of the house"""
         area = 0
-        for norm, area_f in zip(
-            self.mesh_inside.face_normals, self.mesh_inside.area_faces
-        ):
+        for norm, area_f in zip(self.mesh_inside.face_normals, self.mesh_inside.area_faces):
             if norm[2] == -1:
                 area += area_f
         return area
@@ -301,22 +286,16 @@ class Building:
             float value of perimeter
         """
         if where == "outside":
-            return self.mesh.section(
-                plane_origin=self.mesh.bounds[0], plane_normal=[0, 0, 1]
-            ).length
+            return self.mesh.section(plane_origin=self.mesh.bounds[0], plane_normal=[0, 0, 1]).length
         else:
-            return self.mesh_inside.section(
-                plane_origin=self.mesh_inside.bounds[0], plane_normal=[0, 0, 1]
-            ).length
+            return self.mesh_inside.section(plane_origin=self.mesh_inside.bounds[0], plane_normal=[0, 0, 1]).length
 
     def get_efficient_angle(self, reflect_material: dict = None) -> float:
         """ Get angle for material. """
         ang = reflect_material[self.material]
         return ang
 
-    def calc_reflect_power(
-        self, power: float, sun_ang: float, cover_material: str = "polycarbonat"
-    ) -> float:
+    def calc_reflect_power(self, power: float, sun_ang: float, cover_material: str = "polycarbonat") -> float:
         """
         Calculates
         power of reflection based on :
@@ -339,9 +318,7 @@ class Building:
         refl_power = power * kr
         return refl_power
 
-    def get_pv_power_face(
-        self, face_tilt: float, face_azimuth: float, face_area: float
-    ) -> float:
+    def get_pv_power_face(self, face_tilt: float, face_azimuth: float, face_area: float) -> float:
         """
         Get Irradiation from PVLIB.
 
@@ -385,12 +362,8 @@ class Building:
                 face_normal = triangles.normals((tri,))[0][0]
                 face_tilt = geometry.vector_angle((face_normal, (0, 0, 1)))
                 face_normal_projection = self.projection_on_flat(face_normal)
-                face_azimuth = geometry.vector_angle(
-                    (face_normal_projection, (0, 1, 0))
-                )
-                sun_power_face = self.get_pv_power_face(
-                    face_tilt, face_azimuth, face_area,
-                )
+                face_azimuth = geometry.vector_angle((face_normal_projection, (0, 1, 0)))
+                sun_power_face = self.get_pv_power_face(face_tilt, face_azimuth, face_area,)
                 face_seria = pd.Series(sun_power_face, index=self.weather_data.index,)
                 dict_temp_data.update({index: face_seria})
                 face_indexes.append(index)
@@ -400,9 +373,7 @@ class Building:
         self.power_data["sum_solar_power"] = self.power_data[fields].sum(axis=1)
         self.power_data["maximum_solar_power"] = self.power_data[fields].max(axis=1)
         self.power_data["ind_face"] = self.power_data[fields].idxmax(axis=1)
-        self.power_data_by_days = (
-            self.power_data["sum_solar_power"].resample("1D").mean()
-        )
+        self.power_data_by_days = self.power_data["sum_solar_power"].resample("1D").mean()
         return
 
     def get_prop(self, material: str, prop: str) -> float:
