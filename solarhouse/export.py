@@ -6,7 +6,9 @@ import pandas as pd
 
 
 def as_file(
-    pd_data: pd.DataFrame, type_file: str = "csv", path: str = "output"
+    pd_data: pd.DataFrame,
+    type_file: str = "csv",
+    path: str = "output",
 ) -> None:
     """ Export results to file. """
 
@@ -17,7 +19,7 @@ def as_file(
         else:
             file.write(pd_data.to_json(orient="split"))
             pass
-    return
+    return file_path
 
 
 def as_html(pd_data: pd.DataFrame, output_file_dir: str) -> None:
@@ -27,4 +29,3 @@ def as_html(pd_data: pd.DataFrame, output_file_dir: str) -> None:
     ax.plot(pd_data)
     file_obj = os.path.join(output_file_dir, "plots.html")
     mpld3.save_html(fig, file_obj)
-    return

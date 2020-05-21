@@ -124,7 +124,6 @@ class Building:
         self.__mesh_inside = None
         if not self.mesh.is_watertight:
             raise Exception("Mesh is not watertight", "Error")
-        self.geo = geo
         self.material = wall_material
         self.wall_thickness = wall_thickness
         self.current_temp = start_temp_in

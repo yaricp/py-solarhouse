@@ -1,7 +1,6 @@
 import datetime
-import uuid
 import pytz
-
+import uuid
 
 import pandas as pd
 from pvlib.forecast import GFS
@@ -22,14 +21,8 @@ class Calculation:
     def __init__(
         self,
         tz: str,
-        building_mesh_file_path: str,
         geo: dict,
-        wall_material: str,
-        wall_thickness: float,
-        start_temp_in: float,
-        power_heat_inside: float = 0.0,
-        efficiency_collector: float = None,
-        **kwargs
+        building: Building,
     ):
         """ Initialize object for calculate sun power. """
         self.id = str(uuid.uuid4())
@@ -37,16 +30,7 @@ class Calculation:
         self.geo = geo
         self.tz = pytz.timezone(tz)
         self.pd_data_for_export = None
-        self.building = Building(
-            building_mesh_file_path,
-            geo,
-            wall_material,
-            wall_thickness,
-            start_temp_in,
-            power_heat_inside,
-            efficiency_collector,
-            **kwargs
-        )
+        self.building = building
 
     def compute(
         self,
@@ -58,7 +42,11 @@ class Calculation:
     ) -> None:
         """ proxy method for prepare period and calculations. """
         start, end = prepare_period(
-            tz=self.tz, date=date, month=month, year=year, period=period
+            tz=self.tz,
+            date=date,
+            month=month,
+            year=year,
+            period=period,
         )
         return self.start_calculation(start, end, with_weather=with_weather)
 

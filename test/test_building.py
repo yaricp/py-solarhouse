@@ -1,4 +1,3 @@
-
 def test_thickness(building):
     assert building.wall_thickness == 0.3
 

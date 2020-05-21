@@ -1,35 +1,51 @@
 import os, datetime
 
-
-from settings import *
-import solarhouse.export as ex
+import settings
+from solarhouse.building import Building
 from solarhouse.calculation import Calculation
+import solarhouse.export as export
 
 
 def main():
     calc = Calculation(
-                        TZ, 
-                        PATH_FILE_OBJECT,
-                        GEO, 
-                        WALL_MATERIAL,
-                        WALL_THICKNESS, 
-                        TEMPERATURE_START, 
-                        POWER_HEAT_INSIDE,
-                        EFF,
-                        heat_accumulator={'volume': 0.02, 'material': 'water'},
-                        windows={'area': 0.3, 'therm_r': 5.0},
-                        floor={'area': 1.0, 'material': 'adobe', 'thickness': 0.2, 't_out': 4.0},
-                    )
-    date = datetime.datetime(day=22, month=7, year=2019)
-    calc_id = calc.id
-    if not os.path.exists(os.path.join(PATH_OUTPUT, calc_id)):
-        os.mkdir(os.path.join(PATH_OUTPUT, calc_id))
+        tz=settings.TZ,
+        geo=settings.GEO,
+        building=Building(
+            mesh_file=settings.PATH_FILE_OBJECT,
+            geo=settings.GEO,
+            wall_material=settings.WALL_MATERIAL,
+            wall_thickness=settings.WALL_THICKNESS,
+            start_temp_in=settings.TEMPERATURE_START,
+            power_heat_inside=settings.POWER_HEAT_INSIDE,
+            efficiency=settings.EFF,
+            heat_accumulator={
+                'volume': 0.02,
+                'material': 'water',
+            },
+            windows={
+                'area': 0.3,
+                'therm_r': 5.0,
+            },
+            floor={
+                'area': 1.0,
+                'material': 'adobe',
+                'thickness': 0.2,
+                't_out': 4.0,
+            },
+        ),
+    )
+
     data_frame = calc.compute(date=22, month=12, year=2019, with_weather=False)
-    ex.as_file(data_frame, 'csv', os.path.join(PATH_OUTPUT, calc_id))
-    ex.as_html(data_frame, os.path.join(PATH_OUTPUT, calc_id))
+
+    output_dir = os.path.join(settings.PATH_OUTPUT, calc.id)
+    os.makedirs(output_dir, exist_ok=True)
+
+    csv_file_path = export.as_file(data_frame, 'csv', output_dir)
+    export.as_html(data_frame, output_dir)
    
-    with open(os.path.join(PATH_OUTPUT, calc_id, 'data.csv'), 'r') as file:
+    with open(csv_file_path, 'r') as file:
         print(file.read())
 
 
-main()
+if __name__ == "__main__":
+    main()

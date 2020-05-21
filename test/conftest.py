@@ -38,14 +38,17 @@ f 6/18/6 5/19/6 1/20/6 2/11/6
 @pytest.fixture(scope="session")
 def building(mesh_file_path):
     """Create building for tests"""
-    geo = {'latitude': 54.841426, 'longitude': 83.264479}
+    geo = {
+        'latitude': 54.841426,
+        'longitude': 83.264479,
+    }
     material = {
         'birch': {
             'density': 700.0,
             'transcalency': 0.15,
             'heat_capacity': 1250.0
-            }
-        }
+        },
+    }
     ret = Building(
         mesh_file=mesh_file_path,
         geo=geo,
