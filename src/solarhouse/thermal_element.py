@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import numpy as np
 
 
@@ -21,12 +23,12 @@ class ThermalElement:
     Example: compute temperature of 1 cubic meter of water in 1 hour with
              1 kW of power applied:
     >>> e = ThermalElement(\
-            name='cube_water',\
-            temp0=0,\
-            density=997,\
-            heat_capacity=4180,\
-            volume=1\
-            )
+        name='cube_water',\
+        temp0=0,\
+        density=997,\
+        heat_capacity=4180,\
+        volume=1\
+    )
     >>> e.count_layers
     1
     >>> e.compute(q_enter=1000, dt=3600)
@@ -37,16 +39,16 @@ class ThermalElement:
     with dx = 0.01 m and external power of 1 kW.
     Result of test calculated manually.
     >>> e = ThermalElement(\
-            name='birch_wall',\
-            temp0=20.0,\
-            density=700.0,\
-            heat_capacity=1250.0,\
-            dx=0.01,\
-            thickness=0.20,\
-            kappa=0.15,\
-            area_inside=1.0,\
-            area_outside=1.1\
-            )
+        name='birch_wall',\
+        temp0=20.0,\
+        density=700.0,\
+        heat_capacity=1250.0,\
+        dx=0.01,\
+        thickness=0.20,\
+        kappa=0.15,\
+        area_inside=1.0,\
+        area_outside=1.1\
+    )
     >>> e.count_layers
     20
     >>> e.dTx_list
@@ -71,11 +73,11 @@ class ThermalElement:
     >>>
     Example element which implementing  thin layer between two areas
     >>> e = ThermalElement(\
-            name='glass',\
-            temp0=20.0,\
-            area_inside=1.0,\
-            input_alpha=23,\
-            )
+        name='glass',\
+        temp0=20.0,\
+        area_inside=1.0,\
+        input_alpha=23,\
+    )
     >>> e.calc_loss_input_q(25.0)
     115.0
     """

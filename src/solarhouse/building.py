@@ -1,15 +1,14 @@
 import math
-import pandas as pd
-import numpy as np
 
-from pvlib.pvsystem import PVSystem
+import numpy as np
+import pandas as pd
 from pvlib.location import Location
 from pvlib.modelchain import ModelChain
+from pvlib.pvsystem import PVSystem
 from pvlib.temperature import TEMPERATURE_MODEL_PARAMETERS
-
 from trimesh import geometry, load, triangles
 
-import settings
+from . import settings
 
 temp_model_pars = TEMPERATURE_MODEL_PARAMETERS["sapm"]["open_rack_glass_glass"]
 
@@ -124,7 +123,6 @@ class Building:
         self.__mesh_inside = None
         if not self.mesh.is_watertight:
             raise Exception("Mesh is not watertight", "Error")
-        self.geo = geo
         self.material = wall_material
         self.wall_thickness = wall_thickness
         self.current_temp = start_temp_in

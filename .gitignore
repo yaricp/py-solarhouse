@@ -45,5 +45,7 @@ output/
 *.db
 *.db*
 .DS_Store*
-solarhouse/output/
+src/solarhouse/output/
+demos/ouput/
 .idea/
+.pytest_cache

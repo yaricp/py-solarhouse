@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from building import Building
+from solarhouse.building import Building
 
 
 @pytest.fixture(scope="session")

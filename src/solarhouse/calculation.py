@@ -1,14 +1,12 @@
 import datetime
-import uuid
-import pytz
-
 
 import pandas as pd
+import pytz
 from pvlib.forecast import GFS
 
-from building import Building
-from thermal_process import ThermalProcess
-from helpers import prepare_period
+from .building import Building
+from .helpers import prepare_period
+from .thermal_process import ThermalProcess
 
 
 class Calculation:
@@ -19,34 +17,13 @@ class Calculation:
     Also you can export data in file CSV or JSON.
     """
 
-    def __init__(
-        self,
-        tz: str,
-        building_mesh_file_path: str,
-        geo: dict,
-        wall_material: str,
-        wall_thickness: float,
-        start_temp_in: float,
-        power_heat_inside: float = 0.0,
-        efficiency_collector: float = None,
-        **kwargs
-    ):
+    def __init__(self, tz: str, geo: dict, building: Building):
         """ Initialize object for calculate sun power. """
-        self.id = str(uuid.uuid4())
         self.progress = 0
         self.geo = geo
         self.tz = pytz.timezone(tz)
         self.pd_data_for_export = None
-        self.building = Building(
-            building_mesh_file_path,
-            geo,
-            wall_material,
-            wall_thickness,
-            start_temp_in,
-            power_heat_inside,
-            efficiency_collector,
-            **kwargs
-        )
+        self.building = building
 
     def compute(
         self,

@@ -1,8 +1,7 @@
 import matplotlib.pyplot as plt
-import numpy as np
 
-from solarhouse.thermal_element import ThermalElement
-from solarhouse.thermal_model import ThermalModel
+from src.solarhouse.thermal_element import ThermalElement
+from src.solarhouse import ThermalModel
 
 power = 1000
 seconds = 60 * 60
