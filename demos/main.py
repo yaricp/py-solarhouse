@@ -1,6 +1,5 @@
+import datetime
 import os
-
-import uuid
 
 import settings
 from solarhouse.building import Building
@@ -35,10 +34,11 @@ def main():
                 't_out': 4.0,
             },
         ),
-                    )
+    )
+
     data_frame = calc.compute(date=22, month=12, year=2019, with_weather=False)
-    calc_id = str(uuid.uuid4())
-    output_dir = os.path.join(settings.PATH_OUTPUT, calc_id)
+
+    output_dir = os.path.join(settings.PATH_OUTPUT, calc.id)
     os.makedirs(output_dir, exist_ok=True)
 
     csv_file_path = export.as_file(data_frame, 'csv', output_dir)
