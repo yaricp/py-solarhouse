@@ -1,7 +1,10 @@
 import setuptools
+from os import path
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
+this_directory = path.abspath(path.dirname(__file__))
+with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
+
 
 setuptools.setup(
     name="solarhouse",  # Replace with your own username
