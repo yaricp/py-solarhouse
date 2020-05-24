@@ -16,8 +16,10 @@ SPACE_POWER_ON_METER = 1000
 WALL_MATERIAL = 'adobe'
 EFF = 75        #in percents 
 EFF_ANG = 85.0
-GEO = {'latitude': 54.841426, 
-        'longitude': 83.264479}
+GEO = {
+    'latitude': 54.841426,
+    'longitude': 83.264479,
+}
 TZ = 'Asia/Novosibirsk'
 COUNT_FACES_FOR_PARALLEL_CALC = 1000
 PATH_OUTPUT = os.path.join(_this_dir, 'output')
