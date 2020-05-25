@@ -21,7 +21,7 @@ def main():
             power_heat_inside=settings.POWER_HEAT_INSIDE,
             efficiency=settings.EFF,
             heat_accumulator={
-                'volume': 0.02,
+                'volume': 0.032,
                 'material': 'water',
             },
             windows={
@@ -40,7 +40,6 @@ def main():
     calc_id = str(uuid.uuid4())
     output_dir = os.path.join(settings.PATH_OUTPUT, calc_id)
     os.makedirs(output_dir, exist_ok=True)
-
     csv_file_path = export.as_file(data_frame, 'csv', output_dir)
     export.as_html(data_frame, output_dir)
 

@@ -22,4 +22,4 @@ Indices and tables
 * :ref:`search`
 
 
-.. include:: ../../README.rst
+.. include:: README.rst

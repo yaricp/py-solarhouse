@@ -172,10 +172,11 @@ class ThermalProcess:
         :return: dict data of elements in house for plots.
         """
         self.seconds = 60 * 60
-        dt = 5
+        dt = 3
         count_dt = int(self.seconds / dt)
-        pd_for_plot = pd.DataFrame(self.sun_power_data)
-        pd_for_plot.insert(1, "temp_air", self.weather_data)
+        # pd_for_plot = pd.DataFrame(self.sun_power_data)
+        pd_for_plot = pd.DataFrame(self.weather_data)
+        # pd_for_plot.insert(1, "temp_air", self.weather_data)
         dict_for_plot = {}
         self.model.make_init_conditions()
         for name, el in self.model.elements.items():
@@ -189,7 +190,7 @@ class ThermalProcess:
             sun = self.sun_power_data[index]
             t_out = self.weather_data[index]
             self.model.start(count=count_dt, dt=dt, power=sun, t_out=t_out)
-        count = 1
+        count = 0
         for k in dict_for_plot.keys():
             count += 1
             seria = pd.Series(dict_for_plot[k], self.sun_power_data.index)

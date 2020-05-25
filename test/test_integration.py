@@ -35,10 +35,6 @@ def test_main(mesh_file_path, tmpdir):
     export.as_file(data_frame, "csv", output_dir)
     res_file = os.path.join(output_dir, "data.csv")
     ref_res_file = os.path.join("test/ref_files", "data.csv")
-    with open(res_file, "r") as file:
-        print(file.read())
-    with open(ref_res_file, "r") as file:
-        print(file.read())
     assert filecmp.cmp(res_file, ref_res_file)
 
     export.as_html(data_frame, output_dir)

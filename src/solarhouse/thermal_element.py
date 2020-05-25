@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import math
 
 import numpy as np
 
@@ -54,20 +55,18 @@ class ThermalElement:
     >>> e.dTx_list
     [20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0,\
  20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0]
-    >>> round(e.k_area, 3)
-    0.5
     >>> e.get_loss_dx(0)
     0.0
     >>> e.compute(q_enter=1000, dt=1)
     >>> round(e.dTx_list[0], 3)
-    20.114
+    20.109
     >>> round(e.dTx_list[1], 3)
     20.0
     >>> round(e.get_loss_dx(0),3)
-    1.723
+    1.714
     >>> e.compute(q_enter=1000, dt=1)
     >>> round(e.dTx_list[0], 3)
-    20.228
+    20.218
     >>> round(e.dTx_list[1], 4)
     20.0002
     >>>
@@ -97,6 +96,7 @@ class ThermalElement:
         self.area_inside = kwargs.get("area_inside", None)
         self.area_outside = kwargs.get("area_outside", None)
         self.input_alpha = kwargs.get("input_alpha", None)
+        self.by_avegare = kwargs.get("by_average", True)
 
         self.branches_loss = []
         self.counter = 0
@@ -106,8 +106,12 @@ class ThermalElement:
             self.count_layers = int(self.thickness / self.dx)
             self.dTx_list = list(np.ones(self.count_layers) * self.temp)
         self.k_area = None
+        self.area_average = None
         if self.area_inside and self.area_outside and self.area_outside > self.area_inside:
-            self.k_area = (self.area_outside - self.area_inside) / self.thickness
+            if self.by_avegare:
+                self.area_average = (self.area_outside + self.area_inside) / 2
+            else:
+                self.k_area = (math.sqrt(self.area_outside) - math.sqrt(self.area_inside)) / self.thickness
 
     def init_conditions(self, val):
         """Reduction to initial conditions"""
@@ -126,8 +130,11 @@ class ThermalElement:
         :return:
             Float value of area
         """
-        if self.k_area:
-            return self.area_inside + iterator * self.dx * self.k_area
+        if self.by_avegare:
+            return self.area_average
+        else:
+            d_linear = math.sqrt(self.area_inside) + iterator * self.dx * self.k_area
+            return d_linear * d_linear
 
     def __get_kappa_dx(self, iterator):
         """

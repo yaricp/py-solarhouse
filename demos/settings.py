@@ -4,7 +4,7 @@ import pathlib
 
 _this_dir = pathlib.Path(__file__).parent.absolute()
 
-PATH_FILE_OBJECT = os.path.join(_this_dir, 'files/cube.stl')
+PATH_FILE_OBJECT = os.path.join(_this_dir, 'files/cube.obj')
 TIME_TICK = 1    #1 hours
 WALL_THICKNESS = 0.3
 TEMPERATURE_START = 20  #celcium

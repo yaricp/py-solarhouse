@@ -53,14 +53,13 @@ def test_wall_birch():
         20.0,
         20.0,
     ]
-    assert round(e.k_area, 3) == 0.5
     assert e.get_loss_dx(0) == 0.0
     e.compute(1000, 1)
-    assert round(e.dTx_list[0], 3) == 20.114
+    assert round(e.dTx_list[0], 3) == 20.109
     assert round(e.dTx_list[1], 3) == 20.0
-    assert round(e.get_loss_dx(0), 3) == 1.723
+    assert round(e.get_loss_dx(0), 3) == 1.714
     e.compute(1000, 1)
-    assert round(e.dTx_list[0], 3) == 20.228
+    assert round(e.dTx_list[0], 3) == 20.218
     assert round(e.dTx_list[1], 4) == 20.0002
 
 

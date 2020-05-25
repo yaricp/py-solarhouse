@@ -1,4 +1,10 @@
+import os
 import setuptools
+
+this_directory = os.path.abspath(os.path.dirname(__file__))
+with open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
+
 
 setuptools.setup(
     name="solarhouse",  # Replace with your own username
@@ -7,8 +13,7 @@ setuptools.setup(
     author_email="yaricp@gmail.com",
     description="package for calculate solar power what you can get\
                 on surfaces of building by solar heat collectors",
-    long_description="""This package allow you to calculate solar power on all faces of mesh of a house.
-                     Also you can get plots of temperature of elements in a house. """,
+    long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/yaricp/py-solarhouse",
     packages=setuptools.find_packages(),

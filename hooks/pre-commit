@@ -1,6 +1,6 @@
 #!/bin/bash
 
-./run_tests.sh
+./run_tests.sh  --38-only
 RESULT=$?
 echo $RESULT
 [ $RESULT -ne 0 ] && exit 1
