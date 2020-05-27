@@ -7,7 +7,7 @@ with open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 
 setuptools.setup(
-    name="solarhouse",  # Replace with your own username
+    name="py-solarhouse",  # Replace with your own username
     version="0.0.1",
     author="Yaric Pisarev",
     author_email="yaricp@gmail.com",
