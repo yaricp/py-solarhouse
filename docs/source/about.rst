@@ -1,10 +1,11 @@
-About project py-solarhouse
-=====================================
-
 .. meta::
    :keywords: solarpower
    :keywords lang=en: python, solar energy, ecology, eco-house, energy efficiency.
    :keywords lang=ru: солнечная энергетика, энергоэффективность, экологичное жилье.
+
+
+About project py-solarhouse
+=====================================
 
 
 This projects allows you to calculate how many solar energy you can collect on faces of you house and it changes heating season.
