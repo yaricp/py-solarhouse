@@ -1,12 +1,13 @@
-Solarhouse Calculation
+Calculation Class
 =========================
-.. automodule:: calculation
-   :members:
-   :undoc-members:
-   :inherited-members:
+
+.. automodule:: solarhouse.calculation
+    :members:
+
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
+   :caption: Contents:
 
    building
    export
-   helper
+   helpers

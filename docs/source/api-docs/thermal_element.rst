@@ -1,4 +1,6 @@
-Solarhouse ThermalElement
+ThermalElement Class
 =========================
-.. automodule:: thermal_element
-   :members:
+
+
+.. automodule:: solarhouse.thermal_element
+    :members:

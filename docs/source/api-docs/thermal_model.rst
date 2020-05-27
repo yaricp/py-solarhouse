@@ -1,8 +1,12 @@
-Solarhouse ThermalModel
+ThermalModel Class
 =========================
-.. automodule:: thermal_model
-   :members:
+
+.. automodule:: solarhouse.thermal_model
+    :members:
+
+
 .. toctree::
    :maxdepth: 2
+   :caption: Contents:
 
    thermal_element

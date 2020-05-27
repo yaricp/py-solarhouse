@@ -1,4 +1,5 @@
-Solarhouse Export
+Export
 =========================
-.. automodule:: export
-   :members:
+
+.. automodule:: solarhouse.export
+    :members:
