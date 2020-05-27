@@ -5,8 +5,8 @@
 
 .. meta::
    :keywords: solarpower
-   :keywords lang=en: python solar_energy
-   :keywords lang=ru: солнечнаяэнергетика
+   :keywords lang=en: python, solar energy, ecology, eco-house, energy efficiency.
+   :keywords lang=ru: солнечная энергетика, энергоэффективность, экологичное жилье.
 
 
 Welcome to py-solarhouse's documentation!
