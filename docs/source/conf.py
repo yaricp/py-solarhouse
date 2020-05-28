@@ -12,17 +12,22 @@
 #
 import os
 import sys
+
+sys.path.insert(0, os.path.abspath('./../../'))
+from src.solarhouse.version import version
+
+print(version)
+
 sys.path.insert(0, os.path.abspath('./../../src'))
-import solarhouse
 
 # -- Project information -----------------------------------------------------
 
-project = 'py-solarhouse'
+project = 'solarhouse'
 copyright = '2020, Yaric Pisarev'
 author = 'Yaric Pisarev'
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.1'
+release = version
 
 
 # -- General configuration ---------------------------------------------------
@@ -61,3 +66,7 @@ html_static_path = ['_static']
 
 master_doc = 'index'
 
+mathjax_config = {
+    "jax": ["input/TeX","output/HTML-CSS"],
+    "displayAlign": "left"
+}

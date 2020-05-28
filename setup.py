@@ -1,6 +1,8 @@
 import os
 import setuptools
 
+from src.solarhouse.version import version
+
 this_directory = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
@@ -8,7 +10,7 @@ with open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setuptools.setup(
     name="solarhouse",  # Replace with your own username
-    version="0.0.2",
+    version=version,
     author="Yaric Pisarev",
     author_email="yaricp@gmail.com",
     description="package for calculate solar power what you can get\
