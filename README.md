@@ -53,6 +53,16 @@ from github:
 
 ## Usage:
 
+After installation of package you can use it in you code.
+
+Firstly you need to create mesh file which represent shape of house.
+
+It can be create in [Free SketchUp](https://app.sketchup.com)
+
+Also it can be create on any 3D editors which can formed files .obj and .stl
+
+After that put this mesh file to .files/  folder.
+
 file main.py:
 
 
