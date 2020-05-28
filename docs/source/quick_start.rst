@@ -97,7 +97,7 @@ After that you can start calculation:
     $python3 main.py
 
 
-As result you get two files in folder with calc_id name: data.csv and plot.html like on pictures:
+As result you get two files in folder with output/<calc_id> : data.csv and plot.html like on pictures:
 
 .. image:: _static/example1.png
 
