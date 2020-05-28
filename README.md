@@ -9,21 +9,22 @@ This projects allows you to calculate how many solar energy you can collect on f
 For make it you need to load mesh file (.stl or .obj) which represents form of your house and specify some parameters of the house.
 After that just start calculation and get plots of temperatures of elements inside house.
 
-For calculate solar power on each face of house with different tilt and azimuth in py-solarhouse uses `PVLIB <https://pvlib-python.readthedocs.io/en/stable/>`_
+For calculate solar power on each face of house with different tilt and azimuth in py-solarhouse uses [PVLIB](https://pvlib-python.readthedocs.io/en/stable/)
 This library makes it possible to take the weather into account when calculating power.
 
-All thermal processes in the house calculated by models. These models are described here: `Thermal theory <thermal_theory.html>`_
+All thermal processes in the house calculated by models. These models are described here: [Thermal theory](https://solarhouse.readthedocs.io/en/latest/thermal_theory.html)
 
 Substituting different parameters of the house, you can carry out the calculation for each configuration and choose the best combination of parameters to save energy for heating.
 
 ## Version
 0.0.4
 
+## Documentation
+
+[Documentation](https://solarhouse.readthedocs.io)
 
 ## Dependencies
-This application is based upon pygame library and also uses pyaudio and wave libraries.
 
- Dependencies:
 
     numpy
     scipy
