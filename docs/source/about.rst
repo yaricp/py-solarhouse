@@ -4,7 +4,7 @@
    :keywords lang=ru: солнечная энергетика, энергоэффективность, экологичное жилье.
 
 
-About project py-solarhouse
+About project Solarhouse
 =====================================
 
 

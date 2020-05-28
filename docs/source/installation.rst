@@ -1,7 +1,7 @@
 Installation
 =============
 
-Py-solarhouse requires python3 and python3-pip.
+Solarhouse requires python3 and python3-pip.
 Also project requires follows packages:
 
     1. numpy;
@@ -27,7 +27,7 @@ All requirements will be installed automatically
 
 .. code-block:: bash
 
-    $ pip install py-solarhouse
+    $ pip install solarhouse
 
 =========================
 Installation from github

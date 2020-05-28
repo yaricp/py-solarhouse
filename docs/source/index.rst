@@ -9,7 +9,7 @@
    :keywords lang=ru: солнечная энергетика, энергоэффективность, экологичное жилье.
 
 
-Welcome to py-solarhouse's documentation!
+Welcome to Solarhouse's documentation!
 =========================================
 
 .. toctree::
