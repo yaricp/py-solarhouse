@@ -20,7 +20,7 @@ Also project requires follows packages:
 All of these packages are in file requirements.txt
 
 =======================
-Installation from pyip:
+Installation from pypi:
 =======================
 
 All requirements will be installed automatically
