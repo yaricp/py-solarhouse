@@ -111,7 +111,6 @@ file main.py:
 
 file settings.py:
 
-
     import os
     import pathlib
 
