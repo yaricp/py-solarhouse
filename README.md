@@ -4,29 +4,26 @@
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## About
-This projects allows you to calculate how many solar energy you can collect on faces of you house and it changes heating season.
+This project allows for calculation of amount of solar energy one can collect from faces of a house as well as changes of the energy over the heating season in a given geographical location.
 
-For make it you need to load mesh file (.stl or .obj) which represents form of your house and specify some parameters of the house.
-After that just start calculation and get plots of temperatures of elements inside house.
+A mesh file (.stl or .obj) with a model of a house is required. Heat-related parameters of a house are specified in a separated configuration file. After calculation is over, user gets plots and tabulated values of temperatures of elements inside house.
 
-For work with faces of mesh of house used library [PyMesh](https://pymesh.readthedocs.io/en/latest/)
+Model of thermal processes in the house are calculated via models described in the section [Thermal theory](https://solarhouse.readthedocs.io/en/latest/thermal_theory.html) in the project's [documentation](https://solarhouse.readthedocs.io).
 
-For calculate solar power on each face of house with different tilt and azimuth in py-solarhouse used [PVLIB](https://pvlib-python.readthedocs.io/en/stable/)
-This library makes it possible to take the weather into account when calculating power.
+By changing different parameters of the house one can carry out calculations for every configuration and to choose the best combination of parameters to save energy for heating.
 
-All thermal processes in the house calculated by models. These models are described here: [Thermal theory](https://solarhouse.readthedocs.io/en/latest/thermal_theory.html)
-
-Substituting different parameters of the house, you can carry out the calculation for each configuration and choose the best combination of parameters to save energy for heating.
+Credits:
+* faces of mesh are processed by [PyMesh](https://pymesh.readthedocs.io/en/latest/)  library;
+* to calculate solar power on each face of a house with respect to different tilts and azimuths, [PVLIB](https://pvlib-python.readthedocs.io/en/stable/) is used; this library makes it possible to account for real weather when calculating power input.
 
 ## Version
 0.0.4
 
 ## Documentation
 
-[Documentation](https://solarhouse.readthedocs.io)
+[Documentation](https://solarhouse.readthedocs.io).
 
 ## Dependencies
-
 
     numpy
     scipy
@@ -41,32 +38,27 @@ Substituting different parameters of the house, you can carry out the calculatio
     siphon
     tables
 
-## Installation and run
+## Installation
 
-from pypi:
+From PyPI:
 
     $ pip install solarhouse
     
-from github:
+From GitHub:
 
     $ git clone https://github.com/yaricp/py-solarhouse.git
     $ cd py-solarhouse
-    $./install.sh
+    $ ./install.sh
 
-## Usage:
+## Usage
 
-After installation of package you can use it in you code.
+First of all you need to create a mesh with shape of a house. For example, it can be created online in [SketchUp](https://app.sketchup.com) for free (registration is required).
 
-Firstly you need to create mesh file which represent shape of house.
+Alternatively, the mesh can be created in any 3D editor which can produce .obj and .stl files, e.g., [Blender](https://www.blender.org/).
 
-It can be create in [Free SketchUp](https://app.sketchup.com)
-
-Also it can be create on any 3D editors which can formed files .obj and .stl
-
-After that put this mesh file to .files/  folder.
+A ready mesh is put .files/  folder.
 
 file main.py:
-
 
     import os
 
@@ -146,21 +138,13 @@ file settings.py:
     COUNT_FACES_FOR_PARALLEL_CALC = 1000
     PATH_OUTPUT = os.path.join(_this_dir, 'output')
 
-
 All parameters of a house (mesh, thickness of wall, material of walls and etc.) sets in file settings.py
 
 After that you can start calculation:
 
+    $ python3 main.py
 
-    $python3 main.py
-
-
-As result you get two files in folder with output/<calc_id> : data.csv and plot.html
-
+As a result you a spreadsheet and a graph as two files in folder `output/<calc_id>`: `data.csv` and `plot.html`.
 
 ## Author
-Yaroslav Pisarev
-yaricp@gmail.com
-
-
-
+Yaroslav Pisarev (yaricp@gmail.com).
