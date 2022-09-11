@@ -2,7 +2,7 @@ class ThermalModel:
     """
     Class implements process of calculation of some model
     of thermal object which contains several thermal elements.
-    As result you can take plots of temperatures of some thermal elements.
+    As a result you can take plots of temperatures of some thermal elements.
     """
 
     def __init__(self, name, **kwargs):

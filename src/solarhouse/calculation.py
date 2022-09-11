@@ -13,8 +13,8 @@ class Calculation:
     """
     Class implements methods for calculate of the solar power
     what you can take on faces of the building.
-    As result you can get html page with graphics.
-    Also you can export data in file CSV or JSON.
+    As a result you can get html page with graphics.
+    Alternatively, you can export data in file CSV or JSON.
     """
 
     def __init__(self, tz: str, geo: dict, building: Building):

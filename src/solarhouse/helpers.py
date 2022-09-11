@@ -11,7 +11,7 @@ def prepare_period(
     period: tuple = None,
 ) -> tuple:
     """
-    Prepare period for retrive data of wheather and calculate sun power.
+    Prepare period to retrieve data of weather and calculate sun power.
     :param tz:  - time zone of geoposition of building
     :param date:
     :param month:
