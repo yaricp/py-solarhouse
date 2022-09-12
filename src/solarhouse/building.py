@@ -239,7 +239,7 @@ class Building:
     @property
     def area_mass_walls_inside(self) -> float:
         """Calculates area of the walls around the heat accumulator
-        inside of the house."""
+        inside the house."""
         if not self.heat_accumulator:
             return 0
         p = self.get_perimeter_floor("inside")
@@ -248,7 +248,7 @@ class Building:
 
     @property
     def area_mass_walls_outside(self) -> float:
-        """Calculates area of the walls around the heat accumulator outside of
+        """Calculates area of the walls around the heat accumulator outside
          the house."""
         p = self.get_perimeter_floor("outside")
         h = self.heat_accumulator_volume / self.floor_area_inside
@@ -259,7 +259,7 @@ class Building:
 
     @property
     def floor_area_outside(self) -> float:
-        """Calculates area floor outside of the house"""
+        """Calculates area floor outside the house"""
         area = 0
         for norm, area_f in zip(self.mesh.face_normals, self.mesh.area_faces):
             if norm[2] == -1:
@@ -268,7 +268,7 @@ class Building:
 
     @property
     def floor_area_inside(self) -> float:
-        """Calculates area floor inside of the house"""
+        """Calculates area floor inside the house"""
         area = 0
         for norm, area_f in zip(self.mesh_inside.face_normals, self.mesh_inside.area_faces):
             if norm[2] == -1:
@@ -376,7 +376,7 @@ class Building:
 
     def get_prop(self, material: str, prop: str) -> float:
         """
-        Retrive a value of property for some materials.
+        Retrieve a value of property for some materials.
 
         :param material: string of name material
         :param prop: string of name property

@@ -21,11 +21,11 @@ class ThermalProcess:
         self, t_start: float, building: Building, variant: str = "heat_to_mass", for_plots: list = ["mass"],
     ) -> None:
         """
-        Initialize item of thermo calculation.
+        Initialize item of thermal calculation.
         c - ;
         1,007 - Specific heat capacity of air (wikipedia)
         1,1839 - Density of air (wikipedia)
-        There are creating all main thermo elements of the building:
+        There are creating all main thermal elements of the building:
         1. Massive object inside the building
         (It is model of any massive objects: water boiler, hot floor ,etc.)
         2. Air inside the building.
@@ -193,6 +193,6 @@ class ThermalProcess:
         count = 0
         for k in dict_for_plot.keys():
             count += 1
-            seria = pd.Series(dict_for_plot[k], self.sun_power_data.index)
-            pd_for_plot.insert(count, k, seria)
+            series = pd.Series(dict_for_plot[k], self.sun_power_data.index)
+            pd_for_plot.insert(count, k, series)
         return pd_for_plot
